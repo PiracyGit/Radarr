@@ -30,12 +30,12 @@ jobs:
           fi
           NEXTVERSION="${NEXTMAJOR}.${NEXTMINOR}"
           BUILDDATE=$(date +'%B %d %Y')
-          echo "::set-output name=RADARRVERSION::$NEXTVERSION"
-          echo "::set-output name=BRACNH::develop"
-          echo "::set-output name=BUILD_DATE::$BUILDDATE"
+          echo "RADARRVERSION=$NEXTVERSION" >> $GITHUB_OUTPUT
+          echo "BRANCH=develop" >> $GITHUB_OUTPUT
+          echo "BUILD_DATE=$BUILDDATE" >> $GITHUB_OUTPUT
     outputs:
       RADARRVERSION: ${{ steps.setup-env.outputs.RADARRVERSION }}
-      BRACNH: ${{ steps.setup-env.outputs.BRACNH }}
+      BRANCH: ${{ steps.setup-env.outputs.BRANCH }}
       BUILD_DATE: ${{ steps.setup-env.outputs.BUILD_DATE }}
   build:
     runs-on: windows-latest
@@ -71,11 +71,11 @@ jobs:
           name: radarr-build
           path: ${{ runner.TEMP }}/Radarr
       - name: "Prepare: Release"
-        run: tar -czvf Radarr.${{ needs.setup.outputs.BRACNH }}.${{ needs.setup.outputs.RADARRVERSION }}.linux-core-x64.tar.gz -C ${{ runner.TEMP }} Radarr
+        run: tar -czvf Radarr.${{ needs.setup.outputs.BRANCH }}.${{ needs.setup.outputs.RADARRVERSION }}.linux-core-x64.tar.gz -C ${{ runner.TEMP }} Radarr
       - name: "Upload: Release"
         uses: ncipollo/release-action@v1
         with:
-          artifacts: Radarr.${{ needs.setup.outputs.BRACNH }}.${{ needs.setup.outputs.RADARRVERSION }}.linux-core-x64.tar.gz
+          artifacts: Radarr.${{ needs.setup.outputs.BRANCH }}.${{ needs.setup.outputs.RADARRVERSION }}.linux-core-x64.tar.gz
           name: ${{ needs.setup.outputs.RADARRVERSION }}
           tag: v${{ needs.setup.outputs.RADARRVERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -101,7 +101,6 @@ jobs:
           push: true
           context: ./docker
           no-cache: true
-          pull: true
           tags: |
             ghcr.io/piracygit/radarr:latest
             ghcr.io/piracygit/radarr:${{ needs.setup.outputs.RADARRVERSION }}
