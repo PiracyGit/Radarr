@@ -221,7 +221,7 @@ namespace NzbDrone.Core.MediaFiles
 
             if (importMode == ImportMode.Auto)
             {
-                importMode = (downloadClientItem == null || downloadClientItem.CanMoveFiles) ? ImportMode.Move : ImportMode.Copy;
+                importMode = ImportMode.Move;
             }
 
             if (importMode == ImportMode.Move &&

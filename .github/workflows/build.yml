@@ -1,0 +1,111 @@
+name: Build
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout: Setup"
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: "Setup: Environment"
+        id: setup-env
+        run: |
+          git fetch --tags --force
+          LATESTVERSION=$(git describe --tags --abbrev=0 --match=v*)
+          INCREMENT=$(shuf -i 1-100 -n 1)
+          LATESTMINOR=${LATESTVERSION//*.}
+          LATESTMAJOR=${LATESTVERSION%.*}
+          LATESTMAJOR=${LATESTMAJOR:1}
+          NEXTMINOR=$((LATESTMINOR+INCREMENT))
+          NEXTMAJOR=$LATESTMAJOR
+          if [ "$NEXTMINOR" -gt "9999" ]; then
+            NEXTMINOR=$INCREMENT
+            NEXTMAJOR=$(echo ${LATESTMAJOR} | awk -F. -v OFS=. '{$NF += 1 ; print}')
+          fi
+          NEXTVERSION="${NEXTMAJOR}.${NEXTMINOR}"
+          BUILDDATE=$(date +'%B %d %Y')
+          echo "::set-output name=RADARRVERSION::$NEXTVERSION"
+          echo "::set-output name=BRACNH::develop"
+          echo "::set-output name=BUILD_DATE::$BUILDDATE"
+    outputs:
+      RADARRVERSION: ${{ steps.setup-env.outputs.RADARRVERSION }}
+      BRACNH: ${{ steps.setup-env.outputs.BRACNH }}
+      BUILD_DATE: ${{ steps.setup-env.outputs.BUILD_DATE }}
+  build:
+    runs-on: windows-latest
+    needs: [setup]
+    steps:
+      - name: "Checkout: Build"
+        uses: actions/checkout@v3
+      - name: "Setup: Node"
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: "Configure: .NET"
+        run: dotnet new globaljson --sdk-version 6.0.406
+      - name: "Build: Artifacts"
+        run: RADARRVERSION=${{ steps.setup-env.outputs.RADARRVERSION }} ./build.sh
+        shell: bash
+      - name: "Prepare: Artifacts"
+        run: mv ./_artifacts/linux-x64/net6.0/Radarr ./Radarr
+      - name: "Upload: Artifacts"
+        uses: actions/upload-artifact@v3
+        with:
+          name: radarr-build
+          path: Radarr
+  release:
+    runs-on: ubuntu-latest
+    needs: [setup, build]
+    steps:
+      - name: "Checkout: Release"
+        uses: actions/checkout@v3
+      - name: "Download: Artifacts"
+        uses: actions/download-artifact@v3
+        with:
+          name: radarr-build
+          path: ${{ runner.TEMP }}/Radarr
+      - name: "Prepare: Release"
+        run: tar -czvf Radarr.${{ needs.setup.outputs.BRACNH }}.${{ needs.setup.outputs.RADARRVERSION }}.linux-core-x64.tar.gz -C ${{ runner.TEMP }} Radarr
+      - name: "Upload: Release"
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: Radarr.${{ needs.setup.outputs.BRACNH }}.${{ needs.setup.outputs.RADARRVERSION }}.linux-core-x64.tar.gz
+          name: ${{ needs.setup.outputs.RADARRVERSION }}
+          tag: v${{ needs.setup.outputs.RADARRVERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+  docker:
+    runs-on: ubuntu-latest
+    needs: [setup, build, release]
+    steps:
+      - name: "Checkout: Docker"
+        uses: actions/checkout@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          context: ./docker
+          no-cache: true
+          pull: true
+          tags: |
+            ghcr.io/piracygit/radarr:latest
+            ghcr.io/piracygit/radarr:${{ needs.setup.outputs.RADARRVERSION }}
+          build-args: |
+            VERSION=2.1
+            RADARR_VERSION=${{ needs.setup.outputs.RADARRVERSION }}
+            BUILD_DATE=${{ needs.setup.outputs.BUILD_DATE }}

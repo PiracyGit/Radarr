@@ -101,20 +101,7 @@ namespace NzbDrone.Core.MediaFiles.MovieImport
                         }
                     }
 
-                    bool copyOnly;
-                    switch (importMode)
-                    {
-                        default:
-                        case ImportMode.Auto:
-                            copyOnly = downloadClientItem != null && !downloadClientItem.CanMoveFiles;
-                            break;
-                        case ImportMode.Move:
-                            copyOnly = false;
-                            break;
-                        case ImportMode.Copy:
-                            copyOnly = true;
-                            break;
-                    }
+                    bool copyOnly = false;
 
                     if (newDownload)
                     {
