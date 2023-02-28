@@ -102,7 +102,6 @@ jobs:
         with:
           push: true
           context: ./docker
-          no-cache: true
           tags: |
             ghcr.io/piracygit/radarr:latest
             ghcr.io/piracygit/radarr:${{ needs.setup.outputs.RADARRVERSION }}
@@ -110,3 +109,5 @@ jobs:
             VERSION=2.1
             RADARR_VERSION=${{ needs.setup.outputs.RADARRVERSION }}
             BUILD_DATE=${{ needs.setup.outputs.BUILD_DATE }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
