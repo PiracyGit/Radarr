@@ -20,7 +20,7 @@ namespace NzbDrone.Core.Test.ParserTests
         public static object[] OtherSourceQualityParserCases =
         {
             new object[] { "SD TV", Source.TV, Resolution.R480p, Modifier.NONE },
-            new object[] { "SD DVD",  Source.DVD, Resolution.R480p, Modifier.NONE },
+            new object[] { "SD DVD",  Source.DVD, Resolution.Unknown, Modifier.NONE },
             new object[] { "480p WEB-DL", Source.WEBDL, Resolution.R480p, Modifier.NONE },
             new object[] { "HD TV", Source.TV, Resolution.R720p, Modifier.NONE },
             new object[] { "1080p HD TV", Source.TV, Resolution.R1080p, Modifier.NONE },
@@ -79,7 +79,7 @@ namespace NzbDrone.Core.Test.ParserTests
         [TestCase("SomeMovie.2018.DVDRip.ts", false)]
         public void should_parse_dvd_quality(string title, bool proper)
         {
-            ParseAndVerifyQuality(title, Source.DVD, proper, Resolution.R480p);
+            ParseAndVerifyQuality(title, Source.DVD, proper, Resolution.Unknown);
         }
 
         [TestCase("Some.Movie.Magic.Rainbow.2007.DVD5.NTSC", false)]
@@ -252,6 +252,7 @@ namespace NzbDrone.Core.Test.ParserTests
         [TestCase("Movie.Name.2019.720p.MBLURAY.x264-MBLURAYFANS.mkv", false)]
         [TestCase("Movie.Name2017.720p.MBluRay.x264-TREBLE.mkv", false)]
         [TestCase("Movie.Name.2.Parte.2.ITA-ENG.720p.BDMux.DD5.1.x264-DarkSideMux", false)]
+        [TestCase("Movie.Hunter.2018.720p.Blu-ray.Remux.AVC.FLAC.2.0-SiCFoI", false)]
         public void should_parse_bluray720p_quality(string title, bool proper)
         {
             ParseAndVerifyQuality(title, Source.BLURAY, proper, Resolution.R720p);
@@ -452,14 +453,16 @@ namespace NzbDrone.Core.Test.ParserTests
             result.ResolutionDetectionSource.Should().Be(QualityDetectionSource.Name);
         }
 
-        [TestCase("Movie Title 2018 REPACK 720p x264 aAF", true)]
-        [TestCase("Movie.Title.2018.REPACK.720p.x264-aAF", true)]
-        [TestCase("Movie.Title.2018.PROPER.720p.x264-aAF", false)]
-        [TestCase("Movie.Title.2018.RERIP.720p.BluRay.x264-DEMAND", true)]
-        public void should_be_able_to_parse_repack(string title, bool isRepack)
+        [TestCase("Movie Title 2018 REPACK 720p HDTV x264 aAF", true, 2)]
+        [TestCase("Movie.Title.2018.REPACK.720p.HDTV.x264-aAF", true, 2)]
+        [TestCase("Movie.Title.2018.REPACK2.720p.HDTV.x264-aAF", true, 3)]
+        [TestCase("Movie.Title.2018.PROPER.720p.HDTV.x264-aAF", false, 2)]
+        [TestCase("Movie.Title.2018.RERIP.720p.BluRay.x264-DEMAND", true, 2)]
+        [TestCase("Movie.Title.2018.RERIP2.720p.BluRay.x264-DEMAND", true, 3)]
+        public void should_be_able_to_parse_repack(string title, bool isRepack, int version)
         {
             var result = QualityParser.ParseQuality(title);
-            result.Revision.Version.Should().Be(2);
+            result.Revision.Version.Should().Be(version);
             result.Revision.IsRepack.Should().Be(isRepack);
         }
 

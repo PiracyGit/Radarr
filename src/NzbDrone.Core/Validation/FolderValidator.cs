@@ -1,14 +1,12 @@
-﻿using FluentValidation.Validators;
+using FluentValidation.Validators;
+using NzbDrone.Common.Disk;
 using NzbDrone.Common.Extensions;
 
 namespace NzbDrone.Core.Validation
 {
     public class FolderValidator : PropertyValidator
     {
-        public FolderValidator()
-            : base("Invalid Path")
-        {
-        }
+        protected override string GetDefaultMessageTemplate() => "Invalid Path";
 
         protected override bool IsValid(PropertyValidatorContext context)
         {
@@ -17,7 +15,7 @@ namespace NzbDrone.Core.Validation
                 return false;
             }
 
-            return context.PropertyValue.ToString().IsPathValid();
+            return context.PropertyValue.ToString().IsPathValid(PathValidationType.CurrentOs);
         }
     }
 }

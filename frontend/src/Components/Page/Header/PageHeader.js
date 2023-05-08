@@ -55,14 +55,12 @@ class PageHeader extends Component {
         <div className={styles.logoContainer}>
           <Link
             className={styles.logoLink}
-            to={{
-              pathname: '/',
-              state: { restoreScrollPosition: true }
-            }}
+            to={'/'}
           >
             <img
               className={isSmallScreen ? styles.logo : styles.logoFull}
               src={isSmallScreen ? `${window.Radarr.urlBase}/Content/Images/logo.png` : `${window.Radarr.urlBase}/Content/Images/logo-full.png`}
+              alt="Radarr Logo"
             />
           </Link>
         </div>
@@ -81,6 +79,7 @@ class PageHeader extends Component {
           <IconButton
             className={styles.donate}
             name={icons.HEART}
+            aria-label="Donate"
             to="https://radarr.video/donate"
             size={14}
           />

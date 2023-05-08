@@ -1,17 +1,20 @@
 using System;
 using FluentAssertions;
 using Moq;
+using NLog;
 using NUnit.Framework;
 using NzbDrone.Common.Disk;
 using NzbDrone.Common.Http;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Download;
+using NzbDrone.Core.Indexers;
 using NzbDrone.Core.IndexerSearch.Definitions;
 using NzbDrone.Core.Movies;
 using NzbDrone.Core.Parser;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.RemotePathMappings;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Test.IndexerTests;
 
 namespace NzbDrone.Core.Test.Download.DownloadClientTests
 {
@@ -29,8 +32,8 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests
                 .Returns(30);
 
             Mocker.GetMock<IParsingService>()
-                .Setup(s => s.Map(It.IsAny<ParsedMovieInfo>(), It.IsAny<string>(), (SearchCriteriaBase)null))
-                .Returns(() => new MappingResult { RemoteMovie = CreateRemoteMovie(), MappingResultType = MappingResultType.Success });
+                .Setup(s => s.Map(It.IsAny<ParsedMovieInfo>(), It.IsAny<string>(), It.IsAny<int>(), (SearchCriteriaBase)null))
+                .Returns(() => CreateRemoteMovie());
 
             Mocker.GetMock<IHttpClient>()
                   .Setup(s => s.Get(It.IsAny<HttpRequest>()))
@@ -54,6 +57,15 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests
             remoteMovie.Movie = new Movie();
 
             return remoteMovie;
+        }
+
+        protected virtual IIndexer CreateIndexer()
+        {
+            return new TestIndexer(Mocker.Resolve<IHttpClient>(),
+                Mocker.Resolve<IIndexerStatusService>(),
+                Mocker.Resolve<IConfigService>(),
+                Mocker.Resolve<IParsingService>(),
+                Mocker.Resolve<Logger>());
         }
 
         protected void VerifyIdentifiable(DownloadClientItem downloadClientItem)

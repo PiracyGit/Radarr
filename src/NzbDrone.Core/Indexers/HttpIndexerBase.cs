@@ -85,6 +85,11 @@ namespace NzbDrone.Core.Indexers
             return requests;
         }
 
+        public override HttpRequest GetDownloadRequest(string link)
+        {
+            return new HttpRequest(link);
+        }
+
         protected virtual IList<ReleaseInfo> FetchReleases(Func<IIndexerRequestGenerator, IndexerPageableRequestChain> pageableRequestChainSelector, bool isRecent = false)
         {
             var releases = new List<ReleaseInfo>();
@@ -223,9 +228,17 @@ namespace NzbDrone.Core.Indexers
                 _indexerStatusService.RecordFailure(Definition.Id);
                 _logger.Warn("{0} {1}", this, ex.Message);
             }
-            catch (RequestLimitReachedException)
+            catch (RequestLimitReachedException ex)
             {
-                _indexerStatusService.RecordFailure(Definition.Id, TimeSpan.FromHours(1));
+                if (ex.RetryAfter != TimeSpan.Zero)
+                {
+                    _indexerStatusService.RecordFailure(Definition.Id, ex.RetryAfter);
+                }
+                else
+                {
+                    _indexerStatusService.RecordFailure(Definition.Id, TimeSpan.FromHours(1));
+                }
+
                 _logger.Warn("API Request Limit reached for {0}", this);
             }
             catch (ApiKeyException)

@@ -1,15 +1,23 @@
 import { createSelector } from 'reselect';
 
+export function createMovieSelectorForHook(movieId) {
+  return createSelector(
+    (state) => state.movies.itemMap,
+    (state) => state.movies.items,
+    (itemMap, allMovies) => {
+
+      return movieId ? allMovies[itemMap[movieId]]: undefined;
+    }
+  );
+}
+
 function createMovieSelector() {
   return createSelector(
     (state, { movieId }) => movieId,
     (state) => state.movies.itemMap,
     (state) => state.movies.items,
     (movieId, itemMap, allMovies) => {
-      if (allMovies && itemMap && movieId in itemMap) {
-        return allMovies[itemMap[movieId]];
-      }
-      return undefined;
+      return allMovies[itemMap[movieId]];
     }
   );
 }

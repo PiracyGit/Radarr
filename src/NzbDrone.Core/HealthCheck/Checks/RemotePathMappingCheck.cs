@@ -21,7 +21,6 @@ namespace NzbDrone.Core.HealthCheck.Checks
     [CheckOn(typeof(ProviderUpdatedEvent<IDownloadClient>))]
     [CheckOn(typeof(ProviderDeletedEvent<IDownloadClient>))]
     [CheckOn(typeof(ModelEvent<RemotePathMapping>))]
-    [CheckOn(typeof(MovieFileImportedEvent), CheckOnCondition.FailedOnly)]
     [CheckOn(typeof(MovieImportFailedEvent), CheckOnCondition.SuccessfulOnly)]
     public class RemotePathMappingCheck : HealthCheckBase, IProvideHealthCheck
     {
@@ -165,7 +164,7 @@ namespace NzbDrone.Core.HealthCheck.Checks
                         return new HealthCheck(GetType(), HealthCheckResult.Error, _localizationService.GetLocalizedString("RemotePathMappingCheckImportFailed"), "#remote-path-import-failed");
                     }
 
-                    if (!dlpath.IsPathValid())
+                    if (!dlpath.IsPathValid(PathValidationType.CurrentOs))
                     {
                         if (!status.IsLocalhost)
                         {
