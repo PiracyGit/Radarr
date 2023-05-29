@@ -25,7 +25,6 @@ using NzbDrone.Core.Validation;
 using NzbDrone.Core.Validation.Paths;
 using NzbDrone.SignalR;
 using Radarr.Http;
-using Radarr.Http.Extensions;
 using Radarr.Http.REST;
 using Radarr.Http.REST.Attributes;
 
@@ -222,9 +221,8 @@ namespace Radarr.Api.V3.Movies
         }
 
         [RestPutById]
-        public ActionResult<MovieResource> UpdateMovie(MovieResource moviesResource)
+        public ActionResult<MovieResource> UpdateMovie(MovieResource moviesResource, bool moveFiles = false)
         {
-            var moveFiles = Request.GetBooleanQueryParameter("moveFiles");
             var movie = _moviesService.GetMovie(moviesResource.Id);
 
             if (moveFiles)
@@ -255,12 +253,9 @@ namespace Radarr.Api.V3.Movies
         }
 
         [RestDeleteById]
-        public void DeleteMovie(int id)
+        public void DeleteMovie(int id, bool deleteFiles = false, bool addImportExclusion = false)
         {
-            var addExclusion = Request.GetBooleanQueryParameter("addImportExclusion");
-            var deleteFiles = Request.GetBooleanQueryParameter("deleteFiles");
-
-            _moviesService.DeleteMovie(id, deleteFiles, addExclusion);
+            _moviesService.DeleteMovie(id, deleteFiles, addImportExclusion);
         }
 
         private void MapCoversToLocal(MovieResource movie)

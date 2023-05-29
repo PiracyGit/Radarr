@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NzbDrone.Core.Languages;
@@ -52,7 +53,8 @@ namespace NzbDrone.Core.Parser
                                                                new IsoLanguage("bs", "", "bos", "Bosnian", Language.Bosnian),
                                                                new IsoLanguage("et", "", "est", "Estonian", Language.Estonian),
                                                                new IsoLanguage("ta", "", "tam", "Tamil", Language.Tamil),
-                                                               new IsoLanguage("id", "", "ind", "Indonesian", Language.Indonesian)
+                                                               new IsoLanguage("id", "", "ind", "Indonesian", Language.Indonesian),
+                                                               new IsoLanguage("te", "", "tel", "Telugu", Language.Telugu)
                                                            };
 
         public static IsoLanguage Find(string isoCode)
@@ -88,14 +90,14 @@ namespace NzbDrone.Core.Parser
             return null;
         }
 
-        public static IsoLanguage FindByName(string name)
-        {
-            return All.FirstOrDefault(l => l.EnglishName == name.Trim());
-        }
-
         public static IsoLanguage Get(Language language)
         {
             return All.FirstOrDefault(l => l.Language == language);
+        }
+
+        public static IsoLanguage FindByName(string name)
+        {
+            return All.FirstOrDefault(l => l.EnglishName.Equals(name.Trim(), StringComparison.InvariantCultureIgnoreCase));
         }
     }
 }

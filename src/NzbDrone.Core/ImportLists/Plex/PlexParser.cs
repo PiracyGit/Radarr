@@ -14,10 +14,6 @@ namespace NzbDrone.Core.ImportLists.Plex
     {
         private ImportListResponse _importResponse;
 
-        public PlexParser()
-        {
-        }
-
         public virtual IList<ImportListMovie> ParseResponse(ImportListResponse importResponse)
         {
             List<PlexWatchlistItem> items;
@@ -40,7 +36,7 @@ namespace NzbDrone.Core.ImportLists.Plex
                 var tmdbIdString = FindGuid(item.Guids, "tmdb");
                 var imdbId = FindGuid(item.Guids, "imdb");
 
-                int.TryParse(tmdbIdString, out int tmdbId);
+                int.TryParse(tmdbIdString, out var tmdbId);
 
                 movies.AddIfNotNull(new ImportListMovie()
                 {

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using FizzWare.NBuilder;
 using Moq;
 using NUnit.Framework;
@@ -109,7 +108,7 @@ namespace NzbDrone.Core.Test.Extras
 
         private void WithExistingFiles(List<string> files)
         {
-            foreach (string file in files)
+            foreach (var file in files)
             {
                 WithExistingFile(file);
             }

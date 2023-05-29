@@ -21,7 +21,8 @@ namespace NzbDrone.Core.Indexers.Torznab
 
         protected override bool PreProcess(IndexerResponse indexerResponse)
         {
-            if (indexerResponse.HttpResponse.HasHttpError)
+            if (indexerResponse.HttpResponse.HasHttpError &&
+                (indexerResponse.HttpResponse.Headers.ContentType == null || !indexerResponse.HttpResponse.Headers.ContentType.Contains("xml")))
             {
                 base.PreProcess(indexerResponse);
             }
@@ -102,16 +103,16 @@ namespace NzbDrone.Core.Indexers.Torznab
 
         protected override List<Language> GetLanguages(XElement item)
         {
-            var languges = TryGetMultipleTorznabAttributes(item, "language");
+            var languages = TryGetMultipleTorznabAttributes(item, "language");
             var results = new List<Language>();
 
             // Try to find <language> elements for some indexers that suck at following the rules.
-            if (languges.Count == 0)
+            if (languages.Count == 0)
             {
-                languges = item.Elements("language").Select(e => e.Value).ToList();
+                languages = item.Elements("language").Select(e => e.Value).ToList();
             }
 
-            foreach (var language in languges)
+            foreach (var language in languages)
             {
                 var mappedLanguage = IsoLanguages.FindByName(language)?.Language ?? null;
 
@@ -126,10 +127,8 @@ namespace NzbDrone.Core.Indexers.Torznab
 
         protected override long GetSize(XElement item)
         {
-            long size;
-
             var sizeString = TryGetTorznabAttribute(item, "size");
-            if (!sizeString.IsNullOrWhiteSpace() && long.TryParse(sizeString, out size))
+            if (!sizeString.IsNullOrWhiteSpace() && long.TryParse(sizeString, out var size))
             {
                 return size;
             }
@@ -246,9 +245,7 @@ namespace NzbDrone.Core.Indexers.Torznab
         {
             var attr = TryGetTorznabAttribute(item, key, defaultValue.ToString());
 
-            float result = 0;
-
-            if (float.TryParse(attr, out result))
+            if (float.TryParse(attr, out var result))
             {
                 return result;
             }

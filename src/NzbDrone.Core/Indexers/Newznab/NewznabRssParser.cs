@@ -56,7 +56,8 @@ namespace NzbDrone.Core.Indexers.Newznab
 
         protected override bool PreProcess(IndexerResponse indexerResponse)
         {
-            if (indexerResponse.HttpResponse.HasHttpError)
+            if (indexerResponse.HttpResponse.HasHttpError &&
+                (indexerResponse.HttpResponse.Headers.ContentType == null || !indexerResponse.HttpResponse.Headers.ContentType.Contains("xml")))
             {
                 base.PreProcess(indexerResponse);
             }
@@ -106,16 +107,16 @@ namespace NzbDrone.Core.Indexers.Newznab
 
         protected override List<Language> GetLanguages(XElement item)
         {
-            var languges = TryGetMultipleNewznabAttributes(item, "language");
+            var languages = TryGetMultipleNewznabAttributes(item, "language");
             var results = new List<Language>();
 
             // Try to find <language> elements for some indexers that suck at following the rules.
-            if (languges.Count == 0)
+            if (languages.Count == 0)
             {
-                languges = item.Elements("language").Select(e => e.Value).ToList();
+                languages = item.Elements("language").Select(e => e.Value).ToList();
             }
 
-            foreach (var language in languges)
+            foreach (var language in languages)
             {
                 var mappedLanguage = IsoLanguages.FindByName(language)?.Language ?? null;
 
@@ -130,10 +131,8 @@ namespace NzbDrone.Core.Indexers.Newznab
 
         protected override long GetSize(XElement item)
         {
-            long size;
-
             var sizeString = TryGetNewznabAttribute(item, "size");
-            if (!sizeString.IsNullOrWhiteSpace() && long.TryParse(sizeString, out size))
+            if (!sizeString.IsNullOrWhiteSpace() && long.TryParse(sizeString, out var size))
             {
                 return size;
             }
@@ -169,9 +168,8 @@ namespace NzbDrone.Core.Indexers.Newznab
         protected virtual int GetImdbId(XElement item)
         {
             var imdbIdString = TryGetNewznabAttribute(item, "imdb");
-            int imdbId;
 
-            if (!imdbIdString.IsNullOrWhiteSpace() && int.TryParse(imdbIdString, out imdbId))
+            if (!imdbIdString.IsNullOrWhiteSpace() && int.TryParse(imdbIdString, out var imdbId))
             {
                 return imdbId;
             }
@@ -195,9 +193,8 @@ namespace NzbDrone.Core.Indexers.Newznab
         protected virtual int GetImdbYear(XElement item)
         {
             var imdbYearString = TryGetNewznabAttribute(item, "imdbyear");
-            int imdbYear;
 
-            if (!imdbYearString.IsNullOrWhiteSpace() && int.TryParse(imdbYearString, out imdbYear))
+            if (!imdbYearString.IsNullOrWhiteSpace() && int.TryParse(imdbYearString, out var imdbYear))
             {
                 return imdbYear;
             }

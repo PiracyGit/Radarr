@@ -101,6 +101,11 @@ namespace NzbDrone.Core.ThingiProvider
             return _providerRepository.Get(id);
         }
 
+        public IEnumerable<TProviderDefinition> Get(IEnumerable<int> ids)
+        {
+            return _providerRepository.Get(ids);
+        }
+
         public TProviderDefinition Find(int id)
         {
             return _providerRepository.Find(id);
@@ -120,10 +125,32 @@ namespace NzbDrone.Core.ThingiProvider
             _eventAggregator.PublishEvent(new ProviderUpdatedEvent<TProvider>(definition));
         }
 
+        public virtual IEnumerable<TProviderDefinition> Update(IEnumerable<TProviderDefinition> definitions)
+        {
+            _providerRepository.UpdateMany(definitions.ToList());
+
+            foreach (var definition in definitions)
+            {
+                _eventAggregator.PublishEvent(new ProviderUpdatedEvent<TProvider>(definition));
+            }
+
+            return definitions;
+        }
+
         public void Delete(int id)
         {
             _providerRepository.Delete(id);
             _eventAggregator.PublishEvent(new ProviderDeletedEvent<TProvider>(id));
+        }
+
+        public void Delete(IEnumerable<int> ids)
+        {
+            _providerRepository.DeleteMany(ids);
+
+            foreach (var id in ids)
+            {
+                _eventAggregator.PublishEvent(new ProviderDeletedEvent<TProvider>(id));
+            }
         }
 
         public TProvider GetInstance(TProviderDefinition definition)
@@ -169,14 +196,13 @@ namespace NzbDrone.Core.ThingiProvider
             definition.Message = provider.Message;
         }
 
-        // TODO: Remove providers even if the ConfigContract can't be deserialized (this will fail to remove providers if the settings can't be deserialized).
         private void RemoveMissingImplementations()
         {
             var storedProvider = _providerRepository.All();
 
             foreach (var invalidDefinition in storedProvider.Where(def => GetImplementation(def) == null))
             {
-                _logger.Debug("Removing {0} ", invalidDefinition.Name);
+                _logger.Warn("Removing {0}", invalidDefinition.Name);
                 _providerRepository.Delete(invalidDefinition);
             }
         }

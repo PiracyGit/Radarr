@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Dapper;
 using NzbDrone.Core.Datastore;
@@ -57,9 +56,7 @@ namespace NzbDrone.Core.Movies
 
         private Movie Map(Dictionary<int, Movie> dict, Movie movie, Profile profile, MovieFile movieFile, AlternativeTitle altTitle = null, MovieTranslation translation = null)
         {
-            Movie movieEntry;
-
-            if (!dict.TryGetValue(movie.Id, out movieEntry))
+            if (!dict.TryGetValue(movie.Id, out var movieEntry))
             {
                 movieEntry = movie;
                 movieEntry.Profile = profile;

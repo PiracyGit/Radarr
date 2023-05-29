@@ -6,24 +6,31 @@ using Microsoft.AspNetCore.Mvc;
 using NzbDrone.Common.Serializer;
 using NzbDrone.Core.ThingiProvider;
 using NzbDrone.Core.Validation;
-using Radarr.Http.Extensions;
+using Radarr.Api.V3.Movies;
 using Radarr.Http.REST;
 using Radarr.Http.REST.Attributes;
 
 namespace Radarr.Api.V3
 {
-    public abstract class ProviderControllerBase<TProviderResource, TProvider, TProviderDefinition> : RestController<TProviderResource>
+    public abstract class ProviderControllerBase<TProviderResource, TBulkProviderResource, TProvider, TProviderDefinition> : RestController<TProviderResource>
         where TProviderDefinition : ProviderDefinition, new()
         where TProvider : IProvider
         where TProviderResource : ProviderResource<TProviderResource>, new()
+        where TBulkProviderResource : ProviderBulkResource<TBulkProviderResource>, new()
     {
         private readonly IProviderFactory<TProvider, TProviderDefinition> _providerFactory;
         private readonly ProviderResourceMapper<TProviderResource, TProviderDefinition> _resourceMapper;
+        private readonly ProviderBulkResourceMapper<TBulkProviderResource, TProviderDefinition> _bulkResourceMapper;
 
-        protected ProviderControllerBase(IProviderFactory<TProvider, TProviderDefinition> providerFactory, string resource, ProviderResourceMapper<TProviderResource, TProviderDefinition> resourceMapper)
+        protected ProviderControllerBase(IProviderFactory<TProvider,
+            TProviderDefinition> providerFactory,
+            string resource,
+            ProviderResourceMapper<TProviderResource, TProviderDefinition> resourceMapper,
+            ProviderBulkResourceMapper<TBulkProviderResource, TProviderDefinition> bulkResourceMapper)
         {
             _providerFactory = providerFactory;
             _resourceMapper = resourceMapper;
+            _bulkResourceMapper = bulkResourceMapper;
 
             SharedValidator.RuleFor(c => c.Name).NotEmpty();
             SharedValidator.RuleFor(c => c.Name).Must((v, c) => !_providerFactory.All().Any(p => p.Name == c && p.Id != v.Id)).WithMessage("Should be unique");
@@ -44,11 +51,11 @@ namespace Radarr.Api.V3
         [HttpGet]
         public List<TProviderResource> GetAll()
         {
-            var providerDefinitions = _providerFactory.All().OrderBy(p => p.ImplementationName);
+            var providerDefinitions = _providerFactory.All();
 
-            var result = new List<TProviderResource>(providerDefinitions.Count());
+            var result = new List<TProviderResource>(providerDefinitions.Count);
 
-            foreach (var definition in providerDefinitions)
+            foreach (var definition in providerDefinitions.OrderBy(p => p.ImplementationName))
             {
                 _providerFactory.SetProviderCharacteristics(definition);
 
@@ -59,9 +66,9 @@ namespace Radarr.Api.V3
         }
 
         [RestPostById]
-        public ActionResult<TProviderResource> CreateProvider(TProviderResource providerResource)
+        public ActionResult<TProviderResource> CreateProvider([FromBody] TProviderResource providerResource, [FromQuery] bool forceSave = false)
         {
-            var providerDefinition = GetDefinition(providerResource, true, false, false);
+            var providerDefinition = GetDefinition(providerResource, true, !forceSave, false);
 
             if (providerDefinition.Enable)
             {
@@ -74,10 +81,9 @@ namespace Radarr.Api.V3
         }
 
         [RestPutById]
-        public ActionResult<TProviderResource> UpdateProvider(TProviderResource providerResource)
+        public ActionResult<TProviderResource> UpdateProvider([FromBody] TProviderResource providerResource, [FromQuery] bool forceSave = false)
         {
-            var providerDefinition = GetDefinition(providerResource, true, false, false);
-            var forceSave = Request.GetBooleanQueryParameter("forceSave");
+            var providerDefinition = GetDefinition(providerResource, true, !forceSave, false);
 
             // Only test existing definitions if it is enabled and forceSave isn't set.
             if (providerDefinition.Enable && !forceSave)
@@ -88,6 +94,39 @@ namespace Radarr.Api.V3
             _providerFactory.Update(providerDefinition);
 
             return Accepted(providerResource.Id);
+        }
+
+        [HttpPut("bulk")]
+        [Consumes("application/json")]
+        public ActionResult<TProviderResource> UpdateProvider([FromBody] TBulkProviderResource providerResource)
+        {
+            var definitionsToUpdate = _providerFactory.Get(providerResource.Ids).ToList();
+
+            foreach (var definition in definitionsToUpdate)
+            {
+                if (providerResource.Tags != null)
+                {
+                    var newTags = providerResource.Tags;
+                    var applyTags = providerResource.ApplyTags;
+
+                    switch (applyTags)
+                    {
+                        case ApplyTags.Add:
+                            newTags.ForEach(t => definition.Tags.Add(t));
+                            break;
+                        case ApplyTags.Remove:
+                            newTags.ForEach(t => definition.Tags.Remove(t));
+                            break;
+                        case ApplyTags.Replace:
+                            definition.Tags = new HashSet<int>(newTags);
+                            break;
+                    }
+                }
+            }
+
+            _bulkResourceMapper.UpdateModel(providerResource, definitionsToUpdate);
+
+            return Accepted(_providerFactory.Update(definitionsToUpdate).Select(x => _resourceMapper.ToResource(x)));
         }
 
         private TProviderDefinition GetDefinition(TProviderResource providerResource, bool validate, bool includeWarnings, bool forceValidate)
@@ -106,6 +145,15 @@ namespace Radarr.Api.V3
         public object DeleteProvider(int id)
         {
             _providerFactory.Delete(id);
+            return new { };
+        }
+
+        [HttpDelete("bulk")]
+        [Consumes("application/json")]
+        public object DeleteProviders([FromBody] TBulkProviderResource resource)
+        {
+            _providerFactory.Delete(resource.Ids);
+
             return new { };
         }
 
@@ -193,7 +241,7 @@ namespace Radarr.Api.V3
 
         protected void VerifyValidationResult(ValidationResult validationResult, bool includeWarnings)
         {
-            var result = new NzbDroneValidationResult(validationResult.Errors);
+            var result = validationResult as NzbDroneValidationResult ?? new NzbDroneValidationResult(validationResult.Errors);
 
             if (includeWarnings && (!result.IsValid || result.HasWarnings))
             {

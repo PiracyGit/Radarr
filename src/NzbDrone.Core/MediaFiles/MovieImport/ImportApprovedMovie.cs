@@ -57,12 +57,13 @@ namespace NzbDrone.Core.MediaFiles.MovieImport
             _logger.Debug("Decisions: {0}", decisions.Count);
 
             // I added a null op for the rare case that the quality is null. TODO: find out why that would even happen in the first place.
-            var qualifiedImports = decisions.Where(c => c.Approved)
-               .GroupBy(c => c.LocalMovie.Movie.Id, (i, s) => s
-                   .OrderByDescending(c => c.LocalMovie.Quality ?? new QualityModel { Quality = Quality.Unknown }, new QualityModelComparer(s.First().LocalMovie.Movie.Profile))
-                   .ThenByDescending(c => c.LocalMovie.Size))
-               .SelectMany(c => c)
-               .ToList();
+            var qualifiedImports = decisions
+                .Where(decision => decision.Approved)
+                .GroupBy(decision => decision.LocalMovie.Movie.Id)
+                .SelectMany(group => group
+                    .OrderByDescending(decision => decision.LocalMovie.Quality ?? new QualityModel { Quality = Quality.Unknown }, new QualityModelComparer(group.First().LocalMovie.Movie.Profile))
+                    .ThenByDescending(decision => decision.LocalMovie.Size))
+                .ToList();
 
             var importResults = new List<ImportResult>();
 
@@ -111,8 +112,8 @@ namespace NzbDrone.Core.MediaFiles.MovieImport
                     {
                         movieFile.SceneName = localMovie.SceneName;
                         movieFile.OriginalFilePath = GetOriginalFilePath(downloadClientItem, localMovie);
-                        var moveResult = _movieFileUpgrader.UpgradeMovieFile(movieFile, localMovie, copyOnly); // TODO: Check if this works
-                        oldFiles = moveResult.OldFiles;
+
+                        oldFiles = _movieFileUpgrader.UpgradeMovieFile(movieFile, localMovie, copyOnly).OldFiles;
                     }
                     else
                     {

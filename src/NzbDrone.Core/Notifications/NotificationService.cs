@@ -3,7 +3,6 @@ using System.Linq;
 using NLog;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Download;
-using NzbDrone.Core.Download.TrackedDownloads;
 using NzbDrone.Core.HealthCheck;
 using NzbDrone.Core.MediaFiles.Events;
 using NzbDrone.Core.Messaging.Events;
@@ -301,7 +300,7 @@ namespace NzbDrone.Core.Notifications
 
         public void Handle(MoviesDeletedEvent message)
         {
-            foreach (Movie movie in message.Movies)
+            foreach (var movie in message.Movies)
             {
                 var deleteMessage = new MovieDeleteMessage(movie, message.DeleteFiles);
 
