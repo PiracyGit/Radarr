@@ -36,7 +36,7 @@ module.exports = (env) => {
     },
 
     entry: {
-      index: 'index.js'
+      index: 'index.ts'
     },
 
     resolve: {
@@ -66,21 +66,21 @@ module.exports = (env) => {
     output: {
       path: distFolder,
       publicPath: '/',
-      filename: '[name].js',
+      filename: '[name]-[contenthash].js',
       sourceMapFilename: '[file].map'
     },
 
     optimization: {
       moduleIds: 'deterministic',
-      chunkIds: 'named',
-      splitChunks: {
-        chunks: 'initial',
-        name: 'vendors'
-      }
+      chunkIds: isProduction ? 'deterministic' : 'named'
     },
 
     performance: {
       hints: false
+    },
+
+    experiments: {
+      topLevelAwait: true
     },
 
     plugins: [
@@ -90,13 +90,15 @@ module.exports = (env) => {
       }),
 
       new MiniCssExtractPlugin({
-        filename: 'Content/styles.css'
+        filename: 'Content/styles.css',
+        chunkFilename: 'Content/[id]-[chunkhash].css'
       }),
 
       new HtmlWebpackPlugin({
         template: 'frontend/src/index.ejs',
         filename: 'index.html',
-        publicPath: '/'
+        publicPath: '/',
+        inject: false
       }),
 
       new FileManagerPlugin({
@@ -233,6 +235,7 @@ module.exports = (env) => {
             {
               loader: 'url-loader',
               options: {
+                limit: 10240,
                 mimetype: 'application/font-woff',
                 emitFile: false,
                 name: 'Content/Fonts/[name].[ext]'

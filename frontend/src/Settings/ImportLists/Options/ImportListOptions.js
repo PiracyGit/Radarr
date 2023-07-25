@@ -1,12 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import Alert from 'Components/Alert';
 import FieldSet from 'Components/FieldSet';
 import Form from 'Components/Form/Form';
 import FormGroup from 'Components/Form/FormGroup';
 import FormInputGroup from 'Components/Form/FormInputGroup';
 import FormLabel from 'Components/Form/FormLabel';
 import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import { inputTypes } from 'Helpers/Props';
+import { inputTypes, kinds } from 'Helpers/Props';
 import translate from 'Utilities/String/translate';
 
 function ImportListOptions(props) {
@@ -37,31 +38,14 @@ function ImportListOptions(props) {
 
         {
           !isFetching && error &&
-            <div>
+            <Alert kind={kinds.DANGER}>
               {translate('UnableToLoadListOptions')}
-            </div>
+            </Alert>
         }
 
         {
           hasSettings && !isFetching && !error &&
             <Form>
-              <FormGroup
-                advancedSettings={advancedSettings}
-                isAdvanced={true}
-              >
-                <FormLabel>{translate('ListUpdateInterval')}</FormLabel>
-
-                <FormInputGroup
-                  type={inputTypes.NUMBER}
-                  name="importListSyncInterval"
-                  min={6}
-                  unit="hours"
-                  helpText={translate('ImportListSyncIntervalHelpText')}
-                  onChange={onInputChange}
-                  {...settings.importListSyncInterval}
-                />
-              </FormGroup>
-
               <FormGroup
                 advancedSettings={advancedSettings}
                 isAdvanced={true}

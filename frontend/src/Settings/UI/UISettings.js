@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import Alert from 'Components/Alert';
 import FieldSet from 'Components/FieldSet';
 import Form from 'Components/Form/Form';
 import FormGroup from 'Components/Form/FormGroup';
@@ -8,15 +9,25 @@ import FormLabel from 'Components/Form/FormLabel';
 import LoadingIndicator from 'Components/Loading/LoadingIndicator';
 import PageContent from 'Components/Page/PageContent';
 import PageContentBody from 'Components/Page/PageContentBody';
-import { inputTypes } from 'Helpers/Props';
+import { inputTypes, kinds } from 'Helpers/Props';
 import SettingsToolbarConnector from 'Settings/SettingsToolbarConnector';
 import themes from 'Styles/Themes';
 import titleCase from 'Utilities/String/titleCase';
 import translate from 'Utilities/String/translate';
 
 export const firstDayOfWeekOptions = [
-  { key: 0, value: translate('Sunday') },
-  { key: 1, value: translate('Monday') }
+  {
+    key: 0,
+    get value() {
+      return translate('Sunday');
+    }
+  },
+  {
+    key: 1,
+    get value() {
+      return translate('Monday');
+    }
+  }
 ];
 
 export const weekColumnOptions = [
@@ -87,9 +98,9 @@ class UISettings extends Component {
 
           {
             !isFetching && error &&
-              <div>
+              <Alert kind={kinds.DANGER}>
                 {translate('UnableToLoadUISettings')}
-              </div>
+              </Alert>
           }
 
           {

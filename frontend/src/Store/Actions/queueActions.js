@@ -1,8 +1,10 @@
 import _ from 'lodash';
 import moment from 'moment';
+import React from 'react';
 import { createAction } from 'redux-actions';
 import { batchActions } from 'redux-batched-actions';
-import { sortDirections } from 'Helpers/Props';
+import Icon from 'Components/Icon';
+import { icons, sortDirections } from 'Helpers/Props';
 import { createThunk, handleThunks } from 'Store/thunks';
 import createAjaxRequest from 'Utilities/createAjaxRequest';
 import serverSideCollectionHandlers from 'Utilities/serverSideCollectionHandlers';
@@ -59,92 +61,101 @@ export const defaultState = {
     columns: [
       {
         name: 'status',
-        columnLabel: translate('Status'),
+        columnLabel: () => translate('Status'),
         isSortable: true,
         isVisible: true,
         isModifiable: false
       },
       {
         name: 'movies.sortTitle',
-        label: translate('Movie'),
+        label: () => translate('Movie'),
         isSortable: true,
         isVisible: true
       },
       {
         name: 'languages',
-        label: translate('Languages'),
+        label: () => translate('Languages'),
         isSortable: true,
         isVisible: true
       },
       {
         name: 'quality',
-        label: translate('Quality'),
+        label: () => translate('Quality'),
         isSortable: true,
         isVisible: true
       },
       {
         name: 'customFormats',
-        label: translate('Formats'),
+        label: () => translate('Formats'),
         isSortable: false,
         isVisible: true
       },
       {
+        name: 'customFormatScore',
+        columnLabel: translate( 'CustomFormatScore'),
+        label: React.createElement(Icon, {
+          name: icons.SCORE,
+          title: translate( 'CustomFormatScore')
+        }),
+        isVisible: false
+      },
+      {
         name: 'protocol',
-        label: translate('Protocol'),
+        label: () => translate('Protocol'),
         isSortable: true,
         isVisible: false
       },
       {
         name: 'indexer',
-        label: translate('Indexer'),
+        label: () => translate('Indexer'),
         isSortable: true,
         isVisible: false
       },
       {
         name: 'downloadClient',
-        label: translate('DownloadClient'),
+        label: () => translate('DownloadClient'),
         isSortable: true,
         isVisible: false
       },
       {
         name: 'size',
-        label: translate('Size'),
+        label: () => translate('Size'),
         isSortable: true,
         isVisible: false
       },
       {
         name: 'title',
-        label: translate('ReleaseTitle'),
+        label: () => translate('ReleaseTitle'),
         isSortable: true,
         isVisible: false
       },
       {
         name: 'year',
-        label: translate('Year'),
+        label: () => translate('Year'),
         isSortable: true,
         isVisible: true
       },
       {
         name: 'outputPath',
-        label: translate('OutputPath'),
+        label: () => translate('OutputPath'),
         isSortable: false,
         isVisible: false
       },
       {
         name: 'estimatedCompletionTime',
-        label: translate('Timeleft'),
+        label: () => translate('Timeleft'),
         isSortable: true,
         isVisible: true
       },
       {
         name: 'progress',
-        label: translate('Progress'),
+        label: () => translate('Progress'),
         isSortable: true,
         isVisible: true
       },
       {
         name: 'actions',
-        columnLabel: translate('Actions'),
+        columnLabel: () => translate('Actions'),
         isVisible: true,
         isModifiable: false
       }
@@ -360,13 +371,14 @@ export const actionHandlers = handleThunks({
     const {
       id,
       remove,
-      blocklist
+      blocklist,
+      skipRedownload
     } = payload;
 
     dispatch(updateItem({ section: paged, id, isRemoving: true }));
 
     const promise = createAjaxRequest({
-      url: `/queue/${id}?removeFromClient=${remove}&blocklist=${blocklist}`,
+      url: `/queue/${id}?removeFromClient=${remove}&blocklist=${blocklist}&skipRedownload=${skipRedownload}`,
       method: 'DELETE'
     }).request;
 
@@ -383,7 +395,8 @@ export const actionHandlers = handleThunks({
     const {
       ids,
       remove,
-      blocklist
+      blocklist,
+      skipRedownload
     } = payload;
 
     dispatch(batchActions([
@@ -399,7 +412,7 @@ export const actionHandlers = handleThunks({
     ]));
 
     const promise = createAjaxRequest({
-      url: `/queue/bulk?removeFromClient=${remove}&blocklist=${blocklist}`,
+      url: `/queue/bulk?removeFromClient=${remove}&blocklist=${blocklist}&skipRedownload=${skipRedownload}`,
       method: 'DELETE',
       dataType: 'json',
       contentType: 'application/json',

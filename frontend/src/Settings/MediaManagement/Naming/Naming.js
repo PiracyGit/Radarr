@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import Alert from 'Components/Alert';
 import FieldSet from 'Components/FieldSet';
 import Form from 'Components/Form/Form';
 import FormGroup from 'Components/Form/FormGroup';
@@ -7,16 +8,36 @@ import FormInputButton from 'Components/Form/FormInputButton';
 import FormInputGroup from 'Components/Form/FormInputGroup';
 import FormLabel from 'Components/Form/FormLabel';
 import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import { inputTypes, sizes } from 'Helpers/Props';
+import { inputTypes, kinds, sizes } from 'Helpers/Props';
 import translate from 'Utilities/String/translate';
 import NamingModal from './NamingModal';
 import styles from './Naming.css';
 
 const colonReplacementOptions = [
-  { key: 'delete', value: translate('Delete') },
-  { key: 'dash', value: translate('ReplaceWithDash') },
-  { key: 'spaceDash', value: translate('ReplaceWithSpaceDash') },
-  { key: 'spaceDashSpace', value: translate('ReplaceWithSpaceDashSpace') }
+  {
+    key: 'delete',
+    get value() {
+      return translate('Delete');
+    }
+  },
+  {
+    key: 'dash',
+    get value() {
+      return translate('ReplaceWithDash');
+    }
+  },
+  {
+    key: 'spaceDash',
+    get value() {
+      return translate('ReplaceWithSpaceDash');
+    }
+  },
+  {
+    key: 'spaceDashSpace',
+    get value() {
+      return translate('ReplaceWithSpaceDashSpace');
+    }
+  }
 ];
 
 class Naming extends Component {
@@ -91,13 +112,17 @@ class Naming extends Component {
       if (examples.movieExample) {
         standardMovieFormatHelpTexts.push(`Movie: ${examples.movieExample}`);
       } else {
-        standardMovieFormatErrors.push({ message: translate('MovieInvalidFormat') });
+        standardMovieFormatErrors.push({ get message() {
+          return translate('MovieInvalidFormat');
+        } });
       }
 
       if (examples.movieFolderExample) {
         movieFolderFormatHelpTexts.push(`Example: ${examples.movieFolderExample}`);
       } else {
-        movieFolderFormatErrors.push({ message: translate('InvalidFormat') });
+        movieFolderFormatErrors.push({ get message() {
+          return translate('InvalidFormat');
+        } });
       }
     }
 
@@ -110,9 +135,9 @@ class Naming extends Component {
 
         {
           !isFetching && error &&
-            <div>
+            <Alert kind={kinds.DANGER}>
               {translate('UnableToLoadNamingSettings')}
-            </div>
+            </Alert>
         }
 
         {

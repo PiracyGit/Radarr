@@ -23,12 +23,12 @@ export const section = 'movies';
 export const filters = [
   {
     key: 'all',
-    label: translate('All'),
+    label: () => translate('All'),
     filters: []
   },
   {
     key: 'monitored',
-    label: translate('MonitoredOnly'),
+    label: () => translate('MonitoredOnly'),
     filters: [
       {
         key: 'monitored',
@@ -39,7 +39,7 @@ export const filters = [
   },
   {
     key: 'unmonitored',
-    label: translate('Unmonitored'),
+    label: () => translate('Unmonitored'),
     filters: [
       {
         key: 'monitored',
@@ -50,7 +50,7 @@ export const filters = [
   },
   {
     key: 'missing',
-    label: translate('Missing'),
+    label: () => translate('Missing'),
     filters: [
       {
         key: 'monitored',
@@ -66,7 +66,7 @@ export const filters = [
   },
   {
     key: 'wanted',
-    label: translate('Wanted'),
+    label: () => translate('Wanted'),
     filters: [
       {
         key: 'monitored',
@@ -87,7 +87,7 @@ export const filters = [
   },
   {
     key: 'cutoffunmet',
-    label: translate('CutoffUnmet'),
+    label: () => translate('CutoffUnmet'),
     filters: [
       {
         key: 'monitored',
@@ -234,6 +234,18 @@ export const sortPredicates = {
     }
 
     return padNumber(result.toString(), 2) + qualityName;
+  },
+
+  inCinemas: function(item) {
+    return item.inCinemas || '';
+  },
+
+  physicalRelease: function(item) {
+    return item.physicalRelease || '';
+  },
+
+  digitalRelease: function(item) {
+    return item.digitalRelease || '';
   }
 };
 
@@ -335,7 +347,27 @@ export const actionHandlers = handleThunks({
 
   [FETCH_MOVIES]: createFetchHandler(section, '/movie'),
   [SAVE_MOVIE]: createSaveProviderHandler(section, '/movie', { getAjaxOptions: getSaveAjaxOptions }),
-  [DELETE_MOVIE]: createRemoveItemHandler(section, '/movie'),
+  [DELETE_MOVIE]: (getState, payload, dispatch) => {
+    createRemoveItemHandler(section, '/movie')(getState, payload, dispatch);
+
+    if (!payload.collectionTmdbId) {
+      return;
+    }
+
+    const collectionToUpdate = getState().movieCollections.items.find((collection) => collection.tmdbId === payload.collectionTmdbId);
+
+    // Skip updating if the last movie in the collection is being deleted
+    if (collectionToUpdate.movies.length - collectionToUpdate.missingMovies === 1) {
+      return;
+    }
+
+    const collectionData = { ...collectionToUpdate, missingMovies: collectionToUpdate.missingMovies + 1 };
+
+    dispatch(updateItem({
+      section: 'movieCollections',
+      ...collectionData
+    }));
+  },
 
   [TOGGLE_MOVIE_MONITORED]: (getState, payload, dispatch) => {
     const {

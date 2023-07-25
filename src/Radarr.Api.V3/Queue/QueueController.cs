@@ -58,13 +58,14 @@ namespace Radarr.Api.V3.Queue
             _qualityComparer = new QualityModelComparer(qualityProfileService.GetDefaultProfile(string.Empty));
         }
 
+        [NonAction]
         protected override QueueResource GetResourceById(int id)
         {
             throw new NotImplementedException();
         }
 
         [RestDeleteById]
-        public void RemoveAction(int id, bool removeFromClient = true, bool blocklist = false)
+        public void RemoveAction(int id, bool removeFromClient = true, bool blocklist = false, bool skipRedownload = false)
         {
             var pendingRelease = _pendingReleaseService.FindPendingQueueItem(id);
 
@@ -82,12 +83,12 @@ namespace Radarr.Api.V3.Queue
                 throw new NotFoundException();
             }
 
-            Remove(trackedDownload, removeFromClient, blocklist);
+            Remove(trackedDownload, removeFromClient, blocklist, skipRedownload);
             _trackedDownloadService.StopTracking(trackedDownload.DownloadItem.DownloadId);
         }
 
         [HttpDelete("bulk")]
-        public object RemoveMany([FromBody] QueueBulkResource resource, [FromQuery] bool removeFromClient = true, [FromQuery] bool blocklist = false)
+        public object RemoveMany([FromBody] QueueBulkResource resource, [FromQuery] bool removeFromClient = true, [FromQuery] bool blocklist = false, [FromQuery] bool skipRedownload = false)
         {
             var trackedDownloadIds = new List<string>();
             var pendingToRemove = new List<NzbDrone.Core.Queue.Queue>();
@@ -118,7 +119,7 @@ namespace Radarr.Api.V3.Queue
 
             foreach (var trackedDownload in trackedToRemove.DistinctBy(t => t.DownloadItem.DownloadId))
             {
-                Remove(trackedDownload, removeFromClient, blocklist);
+                Remove(trackedDownload, removeFromClient, blocklist, skipRedownload);
                 trackedDownloadIds.Add(trackedDownload.DownloadItem.DownloadId);
             }
 
@@ -219,10 +220,14 @@ namespace Radarr.Api.V3.Queue
                     return q => q.Movie?.MovieMetadata.Value.SortTitle ?? q.Title;
                 case "title":
                     return q => q.Title;
+                case "year":
+                    return q => q.Movie?.Year ?? 0;
                 case "languages":
                     return q => q.Languages;
                 case "quality":
                     return q => q.Quality;
+                case "size":
+                    return q => q.Size;
                 case "progress":
                     // Avoid exploding if a download's size is 0
                     return q => 100 - (q.Sizeleft / Math.Max(q.Size * 100, 1));
@@ -237,7 +242,7 @@ namespace Radarr.Api.V3.Queue
             _pendingReleaseService.RemovePendingQueueItems(pendingRelease.Id);
         }
 
-        private TrackedDownload Remove(TrackedDownload trackedDownload, bool removeFromClient, bool blocklist)
+        private TrackedDownload Remove(TrackedDownload trackedDownload, bool removeFromClient, bool blocklist, bool skipRedownload)
         {
             if (removeFromClient)
             {
@@ -253,7 +258,7 @@ namespace Radarr.Api.V3.Queue
 
             if (blocklist)
             {
-                _failedDownloadService.MarkAsFailed(trackedDownload.DownloadItem.DownloadId);
+                _failedDownloadService.MarkAsFailed(trackedDownload.DownloadItem.DownloadId, skipRedownload);
             }
 
             if (!removeFromClient && !blocklist)

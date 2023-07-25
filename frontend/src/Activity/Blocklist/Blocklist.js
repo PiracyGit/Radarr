@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import Alert from 'Components/Alert';
 import LoadingIndicator from 'Components/Loading/LoadingIndicator';
 import ConfirmModal from 'Components/Modal/ConfirmModal';
 import PageContent from 'Components/Page/PageContent';
@@ -156,16 +157,16 @@ class Blocklist extends Component {
 
           {
             !isFetching && !!error &&
-              <div>
+              <Alert kind={kinds.DANGER}>
                 {translate('UnableToLoadBlocklist')}
-              </div>
+              </Alert>
           }
 
           {
             isPopulated && !error && !items.length &&
-              <div>
-                {translate('NoHistory')}
-              </div>
+              <Alert kind={kinds.INFO}>
+                {translate('NoHistoryBlocklist')}
+              </Alert>
           }
 
           {
@@ -209,7 +210,7 @@ class Blocklist extends Component {
           isOpen={isConfirmRemoveModalOpen}
           kind={kinds.DANGER}
           title={translate('RemoveSelected')}
-          message={translate('AreYouSureYouWantToRemoveTheSelectedItemsFromBlocklist')}
+          message={translate('RemoveSelectedItemBlocklistMessageText')}
           confirmLabel={translate('RemoveSelected')}
           onConfirm={this.onRemoveSelectedConfirmed}
           onCancel={this.onConfirmRemoveModalClose}

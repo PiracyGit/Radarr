@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { createAction } from 'redux-actions';
 import { batchActions } from 'redux-batched-actions';
-import { filterBuilderTypes, filterBuilderValueTypes, filterTypePredicates, sortDirections } from 'Helpers/Props';
+import { filterBuilderTypes, filterBuilderValueTypes, filterTypePredicates, filterTypes, sortDirections } from 'Helpers/Props';
 import { createThunk, handleThunks } from 'Store/thunks';
 import sortByName from 'Utilities/Array/sortByName';
 import createAjaxRequest from 'Utilities/createAjaxRequest';
@@ -60,8 +60,30 @@ export const defaultState = {
   filters: [
     {
       key: 'all',
-      label: 'All',
+      label: () => translate('All'),
       filters: []
+    },
+    {
+      key: 'missing',
+      label: () => translate('Missing'),
+      filters: [
+        {
+          key: 'missingMovies',
+          value: 0,
+          type: filterTypes.GREATER_THAN
+        }
+      ]
+    },
+    {
+      key: 'complete',
+      label: () => translate('Complete'),
+      filters: [
+        {
+          key: 'missingMovies',
+          value: 0,
+          type: filterTypes.EQUAL
+        }
+      ]
     }
   ],
 
@@ -90,29 +112,29 @@ export const defaultState = {
   filterBuilderProps: [
     {
       name: 'title',
-      label: translate('Title'),
+      label: () => translate('Title'),
       type: filterBuilderTypes.STRING
     },
     {
       name: 'monitored',
-      label: translate('Monitored'),
+      label: () => translate('Monitored'),
       type: filterBuilderTypes.EXACT,
       valueType: filterBuilderValueTypes.BOOL
     },
     {
       name: 'qualityProfileId',
-      label: translate('QualityProfile'),
+      label: () => translate('QualityProfile'),
       type: filterBuilderTypes.EXACT,
       valueType: filterBuilderValueTypes.QUALITY_PROFILE
     },
     {
       name: 'rootFolderPath',
-      label: translate('RootFolder'),
+      label: () => translate('RootFolder'),
       type: filterBuilderTypes.STRING
     },
     {
       name: 'genres',
-      label: translate('Genres'),
+      label: () => translate('Genres'),
       type: filterBuilderTypes.ARRAY,
       optionsSelector: function(items) {
         const genreList = items.reduce((acc, collection) => {
@@ -138,7 +160,7 @@ export const defaultState = {
     },
     {
       name: 'totalMovies',
-      label: translate('TotalMovies'),
+      label: () => translate('TotalMovies'),
       type: filterBuilderTypes.NUMBER
     }
   ]
@@ -250,6 +272,9 @@ export const actionHandlers = handleThunks({
     }).request;
 
     promise.done((data) => {
+      const collectionToUpdate = getState().movieCollections.items.find((collection) => collection.tmdbId === data.collection.tmdbId);
+      const collectionData = { ...collectionToUpdate, missingMovies: Math.max(0, collectionToUpdate.missingMovies - 1 ) };
+
       dispatch(batchActions([
         updateItem({ section: 'movies', ...data }),
 
@@ -258,7 +283,9 @@ export const actionHandlers = handleThunks({
           isAdding: false,
           isAdded: true,
           addError: null
-        })
+        }),
+
+        updateItem({ section, ...collectionData })
       ]));
     });
 

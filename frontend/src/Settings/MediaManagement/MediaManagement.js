@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import Alert from 'Components/Alert';
 import FieldSet from 'Components/FieldSet';
 import Form from 'Components/Form/Form';
 import FormGroup from 'Components/Form/FormGroup';
@@ -8,7 +9,7 @@ import FormLabel from 'Components/Form/FormLabel';
 import LoadingIndicator from 'Components/Loading/LoadingIndicator';
 import PageContent from 'Components/Page/PageContent';
 import PageContentBody from 'Components/Page/PageContentBody';
-import { inputTypes, sizes } from 'Helpers/Props';
+import { inputTypes, kinds, sizes } from 'Helpers/Props';
 import RootFoldersConnector from 'RootFolder/RootFoldersConnector';
 import SettingsToolbarConnector from 'Settings/SettingsToolbarConnector';
 import translate from 'Utilities/String/translate';
@@ -16,21 +17,66 @@ import NamingConnector from './Naming/NamingConnector';
 import AddRootFolderConnector from './RootFolder/AddRootFolderConnector';
 
 const rescanAfterRefreshOptions = [
-  { key: 'always', value: translate('Always') },
-  { key: 'afterManual', value: translate('AfterManualRefresh') },
-  { key: 'never', value: translate('Never') }
+  {
+    key: 'always',
+    get value() {
+      return translate('Always');
+    }
+  },
+  {
+    key: 'afterManual',
+    get value() {
+      return translate('AfterManualRefresh');
+    }
+  },
+  {
+    key: 'never',
+    get value() {
+      return translate('Never');
+    }
+  }
 ];
 
 const downloadPropersAndRepacksOptions = [
-  { key: 'preferAndUpgrade', value: translate('PreferAndUpgrade') },
-  { key: 'doNotUpgrade', value: translate('DoNotUpgradeAutomatically') },
-  { key: 'doNotPrefer', value: translate('DoNotPrefer') }
+  {
+    key: 'preferAndUpgrade',
+    get value() {
+      return translate('PreferAndUpgrade');
+    }
+  },
+  {
+    key: 'doNotUpgrade',
+    get value() {
+      return translate('DoNotUpgradeAutomatically');
+    }
+  },
+  {
+    key: 'doNotPrefer',
+    get value() {
+      return translate('DoNotPrefer');
+    }
+  }
 ];
 
 const fileDateOptions = [
-  { key: 'none', value: translate('None') },
-  { key: 'cinemas', value: translate('InCinemasDate') },
-  { key: 'release', value: translate('PhysicalReleaseDate') }
+  {
+    key: 'none',
+    get value() {
+      return translate('None');
+    }
+  },
+  {
+    key: 'cinemas',
+    get value() {
+      return translate('InCinemasDate');
+    }
+  },
+  {
+    key: 'release',
+    get value() {
+      return translate('PhysicalReleaseDate');
+    }
+  }
 ];
 
 class MediaManagement extends Component {
@@ -72,9 +118,9 @@ class MediaManagement extends Component {
           {
             !isFetching && error ?
               <FieldSet legend={translate('NamingSettings')}>
-                <div>
+                <Alert kind={kinds.DANGER}>
                   {translate('UnableToLoadMediaManagementSettings')}
-                </div>
+                </Alert>
               </FieldSet> : null
           }
 

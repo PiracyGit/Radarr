@@ -18,9 +18,8 @@ namespace NzbDrone.Core.Housekeeping.Housekeepers
 
         public void Clean()
         {
-            var mapper = _database.OpenConnection();
-
-            var usedTags = new[] { "Movies", "Notifications", "DelayProfiles", "Restrictions", "ImportLists", "Indexers" }
+            using var mapper = _database.OpenConnection();
+            var usedTags = new[] { "Movies", "Notifications", "DelayProfiles", "Restrictions", "ImportLists", "Indexers", "DownloadClients" }
                 .SelectMany(v => GetUsedTags(v, mapper))
                 .Distinct()
                 .ToList();

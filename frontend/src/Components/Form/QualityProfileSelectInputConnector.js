@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import createSortedSectionSelector from 'Store/Selectors/createSortedSectionSelector';
 import sortByName from 'Utilities/Array/sortByName';
+import translate from 'Utilities/String/translate';
 import EnhancedSelectInput from './EnhancedSelectInput';
 
 function createMapStateToProps() {
@@ -24,7 +25,7 @@ function createMapStateToProps() {
       if (includeNoChange) {
         values.unshift({
           key: 'noChange',
-          value: 'No Change',
+          value: translate('NoChange'),
           disabled: includeNoChangeDisabled
         });
       }
@@ -69,7 +70,7 @@ class QualityProfileSelectInputConnector extends Component {
   // Listeners
 
   onChange = ({ name, value }) => {
-    this.props.onChange({ name, value: parseInt(value) });
+    this.props.onChange({ name, value: value === 'noChange' ? value : parseInt(value) });
   };
 
   //

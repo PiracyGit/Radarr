@@ -29,9 +29,25 @@ interface EditMoviesModalContentProps {
 const NO_CHANGE = 'noChange';
 
 const monitoredOptions = [
-  { key: NO_CHANGE, value: 'No Change', disabled: true },
-  { key: 'monitored', value: 'Monitored' },
-  { key: 'unmonitored', value: 'Unmonitored' },
+  {
+    key: NO_CHANGE,
+    get value() {
+      return translate('NoChange');
+    },
+    disabled: true,
+  },
+  {
+    key: 'monitored',
+    get value() {
+      return translate('Monitored');
+    },
+  },
+  {
+    key: 'unmonitored',
+    get value() {
+      return translate('Unmonitored');
+    },
+  },
 ];
 
 function EditMoviesModalContent(props: EditMoviesModalContentProps) {
@@ -203,7 +219,7 @@ function EditMoviesModalContent(props: EditMoviesModalContentProps) {
           <Button onPress={onModalClose}>{translate('Cancel')}</Button>
 
           <Button onPress={onSavePressWrapper}>
-            {translate('Apply Changes')}
+            {translate('ApplyChanges')}
           </Button>
         </div>
       </ModalFooter>

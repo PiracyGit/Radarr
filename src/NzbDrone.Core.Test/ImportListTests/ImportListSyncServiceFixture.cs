@@ -72,7 +72,7 @@ namespace NzbDrone.Core.Test.ImportList
             };
 
             Mocker.GetMock<IImportListFactory>()
-                  .Setup(v => v.Enabled())
+                  .Setup(v => v.Enabled(It.IsAny<bool>()))
                   .Returns(_importLists);
 
             Mocker.GetMock<IImportExclusionsService>()
@@ -156,6 +156,10 @@ namespace NzbDrone.Core.Test.ImportList
                   .Setup(v => v.GetAllMovies())
                   .Returns(_existingMovies);
 
+            Mocker.GetMock<IImportListMovieService>()
+                .Setup(v => v.GetAllListMovies())
+                .Returns(_list1Movies);
+
             Subject.Execute(_commandAll);
 
             Mocker.GetMock<IMovieService>()
@@ -178,6 +182,10 @@ namespace NzbDrone.Core.Test.ImportList
             Mocker.GetMock<IMovieService>()
                   .Setup(v => v.GetAllMovies())
                   .Returns(_existingMovies);
+
+            Mocker.GetMock<IImportListMovieService>()
+                .Setup(v => v.GetAllListMovies())
+                .Returns(_list1Movies);
 
             Subject.Execute(_commandAll);
 
@@ -204,6 +212,10 @@ namespace NzbDrone.Core.Test.ImportList
                   .Setup(v => v.GetAllMovies())
                   .Returns(_existingMovies);
 
+            Mocker.GetMock<IImportListMovieService>()
+                .Setup(v => v.GetAllListMovies())
+                .Returns(_list1Movies);
+
             Subject.Execute(_commandAll);
 
             Mocker.GetMock<IMovieService>()
@@ -224,6 +236,10 @@ namespace NzbDrone.Core.Test.ImportList
                   .Setup(v => v.GetAllMovies())
                   .Returns(_existingMovies);
 
+            Mocker.GetMock<IImportListMovieService>()
+                .Setup(v => v.GetAllListMovies())
+                .Returns(_list1Movies);
+
             Subject.Execute(_commandAll);
 
             Mocker.GetMock<IMovieService>()
@@ -240,6 +256,10 @@ namespace NzbDrone.Core.Test.ImportList
             Mocker.GetMock<IMovieService>()
                   .Setup(v => v.GetAllMovies())
                   .Returns(_existingMovies);
+
+            Mocker.GetMock<IImportListMovieService>()
+                .Setup(v => v.GetAllListMovies())
+                .Returns(_list1Movies);
 
             Subject.Execute(_commandAll);
 
@@ -266,6 +286,10 @@ namespace NzbDrone.Core.Test.ImportList
             Mocker.GetMock<IMovieService>()
                   .Setup(v => v.GetAllMovies())
                   .Returns(_existingMovies);
+
+            Mocker.GetMock<IImportListMovieService>()
+                .Setup(v => v.GetAllListMovies())
+                .Returns(_list1Movies);
 
             Subject.Execute(_commandAll);
 
@@ -347,7 +371,7 @@ namespace NzbDrone.Core.Test.ImportList
         }
 
         [Test]
-        public void should_not_add_duplicate_movies_from_seperate_lists()
+        public void should_not_add_duplicate_movies_from_separate_lists()
         {
             _list2Movies.ForEach(m => m.ListId = 2);
             _importListFetch.Movies.ForEach(m => m.ListId = 1);
@@ -384,7 +408,7 @@ namespace NzbDrone.Core.Test.ImportList
             Subject.Execute(_commandAll);
 
             Mocker.GetMock<IAddMovieService>()
-                  .Verify(v => v.AddMovies(It.Is<List<Movie>>(s => s.Count == 7 && !s.Any(m => m.TmdbId == _existingMovies[0].TmdbId)), true), Times.Once());
+                  .Verify(v => v.AddMovies(It.Is<List<Movie>>(s => s.Count == 7 && s.All(m => m.TmdbId != _existingMovies[0].TmdbId)), true), Times.Once());
         }
 
         [Test]
@@ -406,7 +430,7 @@ namespace NzbDrone.Core.Test.ImportList
             Subject.Execute(_commandAll);
 
             Mocker.GetMock<IAddMovieService>()
-                  .Verify(v => v.AddMovies(It.Is<List<Movie>>(s => s.Count == 7 && !s.Any(m => m.TmdbId == _existingMovies[0].TmdbId)), true), Times.Once());
+                  .Verify(v => v.AddMovies(It.Is<List<Movie>>(s => s.Count == 7 && s.All(m => m.TmdbId != _existingMovies[0].TmdbId)), true), Times.Once());
         }
     }
 }

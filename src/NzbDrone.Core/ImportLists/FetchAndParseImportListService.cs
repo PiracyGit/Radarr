@@ -63,14 +63,28 @@ namespace NzbDrone.Core.ImportLists
 
             foreach (var importList in importLists)
             {
-                _logger.ProgressInfo("Syncing Movies for List: {0}", importList.Name);
-
                 var importListLocal = importList;
+                var importListStatus = _importListStatusService.GetLastSyncListInfo(importListLocal.Definition.Id);
+
+                if (importListStatus.HasValue)
+                {
+                    var importListNextSync = importListStatus.Value + importListLocal.MinRefreshInterval;
+
+                    if (DateTime.UtcNow < importListNextSync)
+                    {
+                        _logger.Trace("Skipping refresh of Import List {0} ({1}) due to minimum refresh interval. Next Sync after {2}", importList.Name, importListLocal.Definition.Name, importListNextSync);
+
+                        continue;
+                    }
+                }
+
+                _logger.ProgressInfo("Syncing Movies for Import List {0} ({1})", importList.Name, importListLocal.Definition.Name);
+
                 var blockedLists = _importListStatusService.GetBlockedProviders().ToDictionary(v => v.ProviderId, v => v);
 
                 if (blockedLists.TryGetValue(importList.Definition.Id, out var blockedListStatus))
                 {
-                    _logger.Debug("Temporarily ignoring list {0} till {1} due to recent failures.", importList.Definition.Name, blockedListStatus.DisabledTill.Value.ToLocalTime());
+                    _logger.Debug("Temporarily ignoring Import List {0} ({1}) till {2} due to recent failures.", importList.Name, importListLocal.Definition.Name, blockedListStatus.DisabledTill.Value.ToLocalTime());
                     result.AnyFailure |= true; // Ensure we don't clean if a list is down
                     continue;
                 }
@@ -83,12 +97,12 @@ namespace NzbDrone.Core.ImportLists
 
                         lock (result)
                         {
-                            _logger.Debug("Found {0} from {1}", importListReports.Movies.Count, importList.Name);
+                            _logger.Debug("Found {0} from Import List {1} ({2})", importListReports.Movies.Count, importList.Name, importListLocal.Definition.Name);
 
                             if (!importListReports.AnyFailure)
                             {
                                 var alreadyMapped = result.Movies.Where(x => importListReports.Movies.Any(r => r.TmdbId == x.TmdbId));
-                                var listMovies = MapMovieReports(importListReports.Movies.Where(x => !result.Movies.Any(r => r.TmdbId == x.TmdbId)).ToList()).Where(x => x.TmdbId > 0).ToList();
+                                var listMovies = MapMovieReports(importListReports.Movies.Where(x => result.Movies.All(r => r.TmdbId != x.TmdbId)).ToList()).Where(x => x.TmdbId > 0).ToList();
 
                                 listMovies.AddRange(alreadyMapped);
                                 listMovies = listMovies.DistinctBy(x => x.TmdbId).ToList();
@@ -99,11 +113,13 @@ namespace NzbDrone.Core.ImportLists
                             }
 
                             result.AnyFailure |= importListReports.AnyFailure;
+
+                            _importListStatusService.UpdateListSyncStatus(importList.Definition.Id);
                         }
                     }
                     catch (Exception e)
                     {
-                        _logger.Error(e, "Error during Import List Sync for list {0}", importList.Name);
+                        _logger.Error(e, "Error during Import List Sync of {0} ({1})", importList.Name, importListLocal.Definition.Name);
                     }
                 }).LogExceptions();
 
@@ -112,7 +128,9 @@ namespace NzbDrone.Core.ImportLists
 
             Task.WaitAll(taskList.ToArray());
 
-            _logger.Debug("Found {0} reports for all lists", result.Movies.Count);
+            result.Movies = result.Movies.DistinctBy(r => new { r.TmdbId, r.ImdbId, r.Title }).ToList();
+
+            _logger.Debug("Found {0} total reports from {1} lists", result.Movies.Count, importLists.Count);
 
             return result;
         }
@@ -125,7 +143,7 @@ namespace NzbDrone.Core.ImportLists
 
             if (importList == null || !definition.Enable)
             {
-                _logger.Debug("Import list {0} is not enabled. No Movies will be added");
+                _logger.Debug("Import List {0} ({1}) is not enabled, skipping.", importList.Name, importList.Definition.Name);
                 return result;
             }
 
@@ -137,7 +155,7 @@ namespace NzbDrone.Core.ImportLists
 
                 lock (result)
                 {
-                    _logger.Debug("Found {0} from {1}", importListReports.Movies.Count, importList.Name);
+                    _logger.Debug("Found {0} movies from {1} ({2})", importListReports.Movies.Count, importList.Name, importListLocal.Definition.Name);
 
                     if (!importListReports.AnyFailure)
                     {
@@ -151,14 +169,18 @@ namespace NzbDrone.Core.ImportLists
                     }
 
                     result.AnyFailure |= importListReports.AnyFailure;
+
+                    _importListStatusService.UpdateListSyncStatus(importList.Definition.Id);
                 }
             }
             catch (Exception e)
             {
-                _logger.Error(e, "Error during Import List Sync for list {0}", importList.Name);
+                _logger.Error(e, "Error during Import List Sync of {0} ({1})", importList.Name, importListLocal.Definition.Name);
             }
 
-            _logger.Debug("Found {0} reports for list {1}", result.Movies.Count, importList.Name);
+            result.Movies = result.Movies.DistinctBy(r => new { r.TmdbId, r.ImdbId, r.Title }).ToList();
+
+            _logger.Debug("Found {0} movies from {1} ({2})", result.Movies.Count, importList.Name, importListLocal.Definition.Name);
 
             return result;
         }
@@ -166,9 +188,9 @@ namespace NzbDrone.Core.ImportLists
         private List<ImportListMovie> MapMovieReports(List<ImportListMovie> reports)
         {
             var mappedMovies = reports.Select(m => _movieSearch.MapMovieToTmdbMovie(new MovieMetadata { Title = m.Title, TmdbId = m.TmdbId, ImdbId = m.ImdbId, Year = m.Year }))
-                                      .Where(x => x != null)
-                                      .DistinctBy(x => x.TmdbId)
-                                      .ToList();
+                .Where(x => x != null)
+                .DistinctBy(x => x.TmdbId)
+                .ToList();
 
             _movieMetadataService.UpsertMany(mappedMovies);
 

@@ -1,25 +1,33 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import Alert from 'Components/Alert';
 import LoadingIndicator from 'Components/Loading/LoadingIndicator';
 import Table from 'Components/Table/Table';
 import TableBody from 'Components/Table/TableBody';
+import { kinds } from 'Helpers/Props';
 import translate from 'Utilities/String/translate';
 import RootFolderRowConnector from './RootFolderRowConnector';
 
 const rootFolderColumns = [
   {
     name: 'path',
-    label: translate('Path'),
+    get label() {
+      return translate('Path');
+    },
     isVisible: true
   },
   {
     name: 'freeSpace',
-    label: translate('FreeSpace'),
+    get label() {
+      return translate('FreeSpace');
+    },
     isVisible: true
   },
   {
     name: 'unmappedFolders',
-    label: translate('UnmappedFolders'),
+    get label() {
+      return translate('UnmappedFolders');
+    },
     isVisible: true
   },
   {
@@ -44,9 +52,9 @@ function RootFolders(props) {
 
   if (!isFetching && !!error) {
     return (
-      <div>
+      <Alert kind={kinds.DANGER}>
         {translate('UnableToLoadRootFolders')}
-      </div>
+      </Alert>
     );
   }
 
