@@ -49,7 +49,7 @@ csharp_style_inlined_variable_declaration = true
 # Using directive is unnecessary.
 dotnet_diagnostic.IDE0005.severity = error
 # Use var instead of explicit type
-dotnet_diagnostic.IDE0007.severity = error
+dotnet_diagnostic.IDE0007.severity = suggestion
 # Inline variable declaration
 dotnet_diagnostic.IDE0018.severity = error
 
