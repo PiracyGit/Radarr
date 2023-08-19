@@ -19,6 +19,7 @@ namespace NzbDrone.Core.ImportLists
 
         public List<ImportListMovie> Movies { get; set; }
         public bool AnyFailure { get; set; }
+        public int SyncedLists { get; set; }
     }
 
     public abstract class ImportListBase<TSettings> : IImportList
@@ -58,7 +59,6 @@ namespace NzbDrone.Core.ImportLists
 
                 yield return new ImportListDefinition
                 {
-                    Name = GetType().Name,
                     Enabled = config.Validate().IsValid && Enabled,
                     EnableAuto = true,
                     Implementation = GetType().Name,

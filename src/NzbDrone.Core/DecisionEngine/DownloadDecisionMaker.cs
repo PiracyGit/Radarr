@@ -94,7 +94,7 @@ namespace NzbDrone.Core.DecisionEngine
                             _aggregationService.Augment(remoteMovie);
 
                             remoteMovie.CustomFormats = _formatCalculator.ParseCustomFormat(remoteMovie, remoteMovie.Release.Size);
-                            remoteMovie.CustomFormatScore = remoteMovie?.Movie?.Profile?.CalculateCustomFormatScore(remoteMovie.CustomFormats) ?? 0;
+                            remoteMovie.CustomFormatScore = remoteMovie?.Movie?.QualityProfile?.CalculateCustomFormatScore(remoteMovie.CustomFormats) ?? 0;
 
                             remoteMovie.DownloadAllowed = remoteMovie.Movie != null;
                             decision = GetDecisionForReport(remoteMovie, searchCriteria);
@@ -173,8 +173,19 @@ namespace NzbDrone.Core.DecisionEngine
 
         private DownloadDecision GetDecisionForReport(RemoteMovie remoteMovie, SearchCriteriaBase searchCriteria = null)
         {
-            var reasons = _specifications.Select(c => EvaluateSpec(c, remoteMovie, searchCriteria))
-                                         .Where(c => c != null);
+            var reasons = Array.Empty<Rejection>();
+
+            foreach (var specifications in _specifications.GroupBy(v => v.Priority).OrderBy(v => v.Key))
+            {
+                reasons = specifications.Select(c => EvaluateSpec(c, remoteMovie, searchCriteria))
+                                        .Where(c => c != null)
+                                        .ToArray();
+
+                if (reasons.Any())
+                {
+                    break;
+                }
+            }
 
             return new DownloadDecision(remoteMovie, reasons.ToArray());
         }

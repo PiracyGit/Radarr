@@ -40,7 +40,7 @@ namespace NzbDrone.Core.DecisionEngine.Specifications.RssSync
                 return Decision.Accept();
             }
 
-            var profile = subject.Movie.Profile;
+            var profile = subject.Movie.QualityProfile;
             var delayProfile = _delayProfileService.BestForTags(subject.Movie.Tags);
             var delay = delayProfile.GetProtocolDelay(subject.Release.DownloadProtocol);
             var isPreferredProtocol = subject.Release.DownloadProtocol == delayProfile.PreferredProtocol;
@@ -85,6 +85,19 @@ namespace NzbDrone.Core.DecisionEngine.Specifications.RssSync
                 if (isBestInProfile && isPreferredProtocol)
                 {
                     _logger.Debug("Quality is highest in profile for preferred protocol, will not delay.");
+                    return Decision.Accept();
+                }
+            }
+
+            // If quality meets or exceeds the best allowed quality in the profile accept it immediately
+            if (delayProfile.BypassIfAboveCustomFormatScore)
+            {
+                var score = subject.CustomFormatScore;
+                var minimum = delayProfile.MinimumCustomFormatScore;
+
+                if (score >= minimum && isPreferredProtocol)
+                {
+                    _logger.Debug("Custom format score ({0}) meets minimum ({1}) for preferred protocol, will not delay", score, minimum);
                     return Decision.Accept();
                 }
             }
