@@ -41,7 +41,7 @@ namespace NzbDrone.Core.Parser
 
         private static readonly Regex MPEG2Regex = new (@"\b(?<mpeg2>MPEG[-_. ]?2)\b");
 
-        private static readonly Regex BRDISKRegex = new (@"^(?!.*\b((?<!HD[._ -]|HD)DVD|BDRip|720p|MKV|XviD|WMV|d3g|(BD)?REMUX|^(?=.*1080p)(?=.*HEVC)|[xh][-_. ]?26[45]|German.*DL|((?<=\d{4}).*German.*(DL)?)(?=.*\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2)\b))\b)(((?=.*(Blu[-_. ]?ray|BD|HD[-_. ]?DVD)\b)(?=.*\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2|BDMV|ISO)\b))|^((?=.*\b(^((?=.*\b((.*_)?COMPLETE.*|Dis[ck])\b)(?=.*(Blu[-_. ]?ray|HD[-_. ]?DVD)))|3D[-_. ]?BD|BR[-_. ]?DISK|Full[-_. ]?Blu[-_. ]?ray|^((?=.*((BD|UHD)[-_. ]?(25|50|66|100|ISO)))))))).*",
+        private static readonly Regex BRDISKRegex = new (@"^(?!.*\b((?<!HD[._ -]|HD)DVD|BDRip|720p|MKV|XviD|WMV|d3g|(BD)?REMUX|^(?=.*1080p)(?=.*HEVC)|[xh][-_. ]?26[45]|German.*[DM]L|((?<=\d{4}).*German.*([DM]L)?)(?=.*\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2)\b))\b)(((?=.*\b(Blu[-_. ]?ray|BD|HD[-_. ]?DVD)\b)(?=.*\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2|BDMV|ISO)\b))|^((?=.*\b(^((?=.*\b((.*_)?COMPLETE.*|Dis[ck])\b)(?=.*(Blu[-_. ]?ray|HD[-_. ]?DVD)))|3D[-_. ]?BD|BR[-_. ]?DISK|Full[-_. ]?Blu[-_. ]?ray|^((?=.*((BD|UHD)[-_. ]?(25|50|66|100|ISO)))))))).*",
                                                             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private static readonly Regex ProperRegex = new (@"\b(?<proper>proper)\b",
@@ -74,6 +74,7 @@ namespace NzbDrone.Core.Parser
         private static readonly Regex HighDefPdtvRegex = new (@"hr[-_. ]ws", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private static readonly Regex RemuxRegex = new (@"(?:[_. \[]|\d{4}p-)(?<remux>(?:(BD|UHD)[-_. ]?)?Remux)\b|(?<remux>(?:(BD|UHD)[-_. ]?)?Remux[_. ]\d{4}p)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex GermanRemuxRegex = new Regex(@"((?<=\d{4}).*German.*([DM]L)?)(?=.*\b(AVC|HEVC|VC[_. -]?1|MVC|MPEG[_. -]?2))(?=.*Blu-?ray)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public static QualityModel ParseQuality(string name)
         {
@@ -112,7 +113,7 @@ namespace NzbDrone.Core.Parser
             var sourceMatch = sourceMatches.OfType<Match>().LastOrDefault();
             var resolution = ParseResolution(normalizedName);
             var codecRegex = CodecRegex.Match(normalizedName);
-            var remuxMatch = RemuxRegex.IsMatch(normalizedName);
+            var remuxMatch = RemuxRegex.IsMatch(normalizedName) || GermanRemuxRegex.IsMatch(normalizedName);
             var brDiskMatch = BRDISKRegex.IsMatch(normalizedName);
 
             if (RawHDRegex.IsMatch(normalizedName) && !brDiskMatch)
@@ -458,13 +459,13 @@ namespace NzbDrone.Core.Parser
 
             if (resolution != Resolution.Unknown)
             {
-                var source = Source.UNKNOWN;
+                var source = QualitySource.UNKNOWN;
                 var modifier = Modifier.NONE;
 
                 if (remuxMatch)
                 {
                     result.SourceDetectionSource = QualityDetectionSource.Name;
-                    source = Source.BLURAY;
+                    source = QualitySource.BLURAY;
                     modifier = Modifier.REMUX;
                 }
                 else
@@ -489,7 +490,7 @@ namespace NzbDrone.Core.Parser
                 {
                     result.ResolutionDetectionSource = QualityDetectionSource.Name;
 
-                    result.Quality = source == Source.UNKNOWN
+                    result.Quality = source == QualitySource.UNKNOWN
                         ? Quality.HDTV2160p
                         : QualityFinder.FindBySourceAndResolution(source, 2160, modifier);
 
@@ -500,7 +501,7 @@ namespace NzbDrone.Core.Parser
                 {
                     result.ResolutionDetectionSource = QualityDetectionSource.Name;
 
-                    result.Quality = source == Source.UNKNOWN
+                    result.Quality = source == QualitySource.UNKNOWN
                         ? Quality.HDTV1080p
                         : QualityFinder.FindBySourceAndResolution(source, 1080, modifier);
 
@@ -511,7 +512,7 @@ namespace NzbDrone.Core.Parser
                 {
                     result.ResolutionDetectionSource = QualityDetectionSource.Name;
 
-                    result.Quality = source == Source.UNKNOWN
+                    result.Quality = source == QualitySource.UNKNOWN
                         ? Quality.HDTV720p
                         : QualityFinder.FindBySourceAndResolution(source, 720, modifier);
 
@@ -523,7 +524,7 @@ namespace NzbDrone.Core.Parser
                 {
                     result.ResolutionDetectionSource = QualityDetectionSource.Name;
 
-                    result.Quality = source == Source.UNKNOWN
+                    result.Quality = source == QualitySource.UNKNOWN
                         ? Quality.SDTV
                         : QualityFinder.FindBySourceAndResolution(source, 480, modifier);
 

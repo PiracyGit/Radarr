@@ -639,29 +639,21 @@
               "type": "boolean",
               "default": false
             }
+          },
+          {
+            "name": "tags",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "Success",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MovieResource"
-                  }
-                }
-              },
               "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MovieResource"
-                  }
-                }
-              },
-              "text/json": {
                 "schema": {
                   "type": "array",
                   "items": {
@@ -4085,6 +4077,25 @@
         }
       }
     },
+    "/api/v3/localization/language": {
+      "get": {
+        "tags": [
+          "Localization"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalizationLanguageResource"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v3/log": {
       "get": {
         "tags": [
@@ -6911,16 +6922,6 @@
               "schema": {
                 "$ref": "#/components/schemas/ReleaseResource"
               }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReleaseResource"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReleaseResource"
-              }
             }
           }
         },
@@ -6948,23 +6949,7 @@
           "200": {
             "description": "Success",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ReleaseResource"
-                  }
-                }
-              },
               "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ReleaseResource"
-                  }
-                }
-              },
-              "text/json": {
                 "schema": {
                   "type": "array",
                   "items": {
@@ -8468,21 +8453,6 @@
           "cleanTitle": {
             "type": "string",
             "nullable": true
-          },
-          "sourceId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "votes": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "voteCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "language": {
-            "$ref": "#/components/schemas/Language"
           }
         },
         "additionalProperties": false
@@ -8508,21 +8478,6 @@
           "cleanTitle": {
             "type": "string",
             "nullable": true
-          },
-          "sourceId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "votes": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "voteCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "language": {
-            "$ref": "#/components/schemas/Language"
           }
         },
         "additionalProperties": false
@@ -9621,6 +9576,9 @@
           "placeholder": {
             "type": "string",
             "nullable": true
+          },
+          "isFloat": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -10387,6 +10345,16 @@
         },
         "additionalProperties": false
       },
+      "LocalizationLanguageResource": {
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "LogFileResource": {
         "type": "object",
         "properties": {
@@ -10688,13 +10656,17 @@
             "type": "string",
             "nullable": true
           },
-          "videoDynamicRangeType": {
-            "type": "string",
-            "nullable": true
-          },
           "videoFps": {
             "type": "number",
             "format": "double"
+          },
+          "videoDynamicRange": {
+            "type": "string",
+            "nullable": true
+          },
+          "videoDynamicRangeType": {
+            "type": "string",
+            "nullable": true
           },
           "resolution": {
             "type": "string",
@@ -11930,7 +11902,7 @@
             "nullable": true
           },
           "source": {
-            "$ref": "#/components/schemas/Source"
+            "$ref": "#/components/schemas/QualitySource"
           },
           "resolution": {
             "type": "integer",
@@ -12062,6 +12034,21 @@
           }
         },
         "additionalProperties": false
+      },
+      "QualitySource": {
+        "enum": [
+          "unknown",
+          "cam",
+          "telesync",
+          "telecine",
+          "workprint",
+          "dvd",
+          "tv",
+          "webdl",
+          "webrip",
+          "bluray"
+        ],
+        "type": "string"
       },
       "QueueBulkResource": {
         "type": "object",
@@ -12433,6 +12420,11 @@
             },
             "nullable": true
           },
+          "mappedMovieId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
           "approved": {
             "type": "boolean"
           },
@@ -12515,6 +12507,15 @@
           "movieId": {
             "type": "integer",
             "format": "int32",
+            "nullable": true
+          },
+          "downloadClientId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "shouldOverride": {
+            "type": "boolean",
             "nullable": true
           }
         },
@@ -12660,21 +12661,6 @@
           "default",
           "ascending",
           "descending"
-        ],
-        "type": "string"
-      },
-      "Source": {
-        "enum": [
-          "unknown",
-          "cam",
-          "telesync",
-          "telecine",
-          "workprint",
-          "dvd",
-          "tv",
-          "webdl",
-          "webrip",
-          "bluray"
         ],
         "type": "string"
       },
