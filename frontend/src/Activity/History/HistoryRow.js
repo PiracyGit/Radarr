@@ -99,7 +99,7 @@ class HistoryRow extends Component {
               );
             }
 
-            if (name === 'movies.sortTitle') {
+            if (name === 'movieMetadata.sortTitle') {
               return (
                 <TableRowCell key={name}>
                   <MovieTitleLink
@@ -217,10 +217,12 @@ class HistoryRow extends Component {
                   key={name}
                   className={styles.details}
                 >
-                  <IconButton
-                    name={icons.INFO}
-                    onPress={this.onDetailsPress}
-                  />
+                  <div className={styles.actionContents}>
+                    <IconButton
+                      name={icons.INFO}
+                      onPress={this.onDetailsPress}
+                    />
+                  </div>
                 </TableRowCell>
               );
             }

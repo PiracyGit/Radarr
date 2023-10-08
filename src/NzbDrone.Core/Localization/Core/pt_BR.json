@@ -629,7 +629,7 @@
     "SomeResultsHiddenFilter": "Alguns resultados estão ocultos pelo filtro aplicado",
     "Socks5": "Socks5 (Suporte à TOR)",
     "Small": "Pequeno",
-    "SkipFreeSpaceCheckWhenImportingHelpText": "Use quando o Radarr não conseguir detectar espaço livre na pasta raiz do filme",
+    "SkipFreeSpaceCheckWhenImportingHelpText": "Use quando o Radarr não conseguir detectar espaço livre em sua pasta raiz durante a importação do arquivo",
     "SkipFreeSpaceCheck": "Ignorar verificação de espaço livre",
     "SizeOnDisk": "Tamanho em disco",
     "Size": "Tamanho",
@@ -1261,7 +1261,7 @@
     "True": "Verdadeiro",
     "HealthMessagesInfoBox": "Você pode encontrar mais informações sobre a causa dessas mensagens de verificação de integridade clicando no link da wiki (ícone do livro) no final da linha ou verificando seus [logs]({link}). Se tiver dificuldade em interpretar essas mensagens, você pode entrar em contato com nosso suporte, nos links abaixo.",
     "DefaultNameCopiedProfile": "{name} - Cópia",
-    "InvalidUILanguage": "Sua IU está definida com um idioma inválido, corrija-a e salve suas configurações",
+    "InvalidUILanguage": "Sua IU está configurada com um idioma inválido, corrija-a e salve suas configurações",
     "AuthenticationMethod": "Método de Autenticação",
     "AuthenticationMethodHelpTextWarning": "Selecione um método de autenticação válido",
     "AuthenticationRequiredPasswordHelpTextWarning": "Insira uma nova senha",
@@ -1285,7 +1285,7 @@
     "DownloadIgnored": "Download ignorado",
     "GrabId": "Obter ID",
     "HistoryLoadError": "Não foi possível carregar o histórico",
-    "InfoUrl": "URL com informações",
+    "InfoUrl": "URL da info",
     "MovieImported": "Filme Importado",
     "MovieGrabbedHistoryTooltip": "Filme obtido de {indexer} e enviado para {downloadClient}",
     "MovieImportedTooltip": "Filme baixado com sucesso e obtido no cliente de download",
@@ -1328,5 +1328,7 @@
     "OrganizeNamingPattern": "Padrão de nomenclatura: `{standardMovieFormat}`",
     "OrganizeNothingToRename": "Sucesso! Meu trabalho está concluído, não há arquivos para renomear.",
     "OrganizeRelativePaths": "Todos os caminhos são relativos a: `{path}`",
-    "OrganizeRenamingDisabled": "A renomeação está desativada, nada para renomear"
+    "OrganizeRenamingDisabled": "A renomeação está desativada, nada para renomear",
+    "DownloadClientRemovesCompletedDownloadsHealthCheckMessage": "O cliente de download {0} está configurado para remover downloads concluídos. Isso pode resultar na remoção dos downloads do seu cliente antes que {1} possa importá-los.",
+    "Umask": "Desmascarar"
 }
