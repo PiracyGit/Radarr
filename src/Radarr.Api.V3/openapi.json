@@ -162,25 +162,25 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "Username": {
+                  "username": {
                     "type": "string"
                   },
-                  "Password": {
+                  "password": {
                     "type": "string"
                   },
-                  "RememberMe": {
+                  "rememberMe": {
                     "type": "string"
                   }
                 }
               },
               "encoding": {
-                "Username": {
+                "username": {
                   "style": "form"
                 },
-                "Password": {
+                "password": {
                   "style": "form"
                 },
-                "RememberMe": {
+                "rememberMe": {
                   "style": "form"
                 }
               }
@@ -493,6 +493,40 @@
       "get": {
         "tags": [
           "Blocklist"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "sortKey",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortDirection",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/SortDirection"
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -2414,10 +2448,90 @@
         ],
         "parameters": [
           {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "sortKey",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortDirection",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/SortDirection"
+            }
+          },
+          {
             "name": "includeMovie",
             "in": "query",
             "schema": {
               "type": "boolean"
+            }
+          },
+          {
+            "name": "eventType",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "downloadId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "movieIds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "languages",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "quality",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
             }
           }
         ],
@@ -2425,17 +2539,7 @@
           "200": {
             "description": "Success",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/HistoryResourcePagingResource"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HistoryResourcePagingResource"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HistoryResourcePagingResource"
                 }
@@ -2479,23 +2583,7 @@
           "200": {
             "description": "Success",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/HistoryResource"
-                  }
-                }
-              },
               "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/HistoryResource"
-                  }
-                }
-              },
-              "text/json": {
                 "schema": {
                   "type": "array",
                   "items": {
@@ -2542,23 +2630,7 @@
           "200": {
             "description": "Success",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/HistoryResource"
-                  }
-                }
-              },
               "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/HistoryResource"
-                  }
-                }
-              },
-              "text/json": {
                 "schema": {
                   "type": "array",
                   "items": {
@@ -4075,21 +4147,52 @@
         "tags": [
           "Log"
         ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "sortKey",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortDirection",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/SortDirection"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/LogResourcePagingResource"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LogResourcePagingResource"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/LogResourcePagingResource"
                 }
@@ -5612,70 +5715,70 @@
         ],
         "parameters": [
           {
-            "name": "RenameMovies",
+            "name": "renameMovies",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "ReplaceIllegalCharacters",
+            "name": "replaceIllegalCharacters",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "ColonReplacementFormat",
+            "name": "colonReplacementFormat",
             "in": "query",
             "schema": {
               "$ref": "#/components/schemas/ColonReplacementFormat"
             }
           },
           {
-            "name": "StandardMovieFormat",
+            "name": "standardMovieFormat",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "MovieFolderFormat",
+            "name": "movieFolderFormat",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "IncludeQuality",
+            "name": "includeQuality",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "ReplaceSpaces",
+            "name": "replaceSpaces",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "Separator",
+            "name": "separator",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "NumberStyle",
+            "name": "numberStyle",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "Id",
+            "name": "id",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -5683,7 +5786,7 @@
             }
           },
           {
-            "name": "ResourceName",
+            "name": "resourceName",
             "in": "query",
             "schema": {
               "type": "string"
@@ -6598,6 +6701,38 @@
         ],
         "parameters": [
           {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "sortKey",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortDirection",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/SortDirection"
+            }
+          },
+          {
             "name": "includeUnknownMovieItems",
             "in": "query",
             "schema": {
@@ -6612,23 +6747,50 @@
               "type": "boolean",
               "default": false
             }
+          },
+          {
+            "name": "movieIds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "protocol",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DownloadProtocol"
+            }
+          },
+          {
+            "name": "languages",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "quality",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "Success",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/QueueResourcePagingResource"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/QueueResourcePagingResource"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/QueueResourcePagingResource"
                 }
@@ -8639,13 +8801,6 @@
           "sortDirection": {
             "$ref": "#/components/schemas/SortDirection"
           },
-          "filters": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PagingResourceFilter"
-            },
-            "nullable": true
-          },
           "totalRecords": {
             "type": "integer",
             "format": "int32"
@@ -9317,6 +9472,9 @@
           },
           "autoRedownloadFailed": {
             "type": "boolean"
+          },
+          "autoRedownloadFailedFromInteractiveSearch": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -9634,13 +9792,6 @@
           },
           "sortDirection": {
             "$ref": "#/components/schemas/SortDirection"
-          },
-          "filters": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PagingResourceFilter"
-            },
-            "nullable": true
           },
           "totalRecords": {
             "type": "integer",
@@ -10365,13 +10516,6 @@
           },
           "sortDirection": {
             "$ref": "#/components/schemas/SortDirection"
-          },
-          "filters": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PagingResourceFilter"
-            },
-            "nullable": true
           },
           "totalRecords": {
             "type": "integer",
@@ -11616,20 +11760,6 @@
         },
         "additionalProperties": false
       },
-      "PagingResourceFilter": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "nullable": true
-          },
-          "value": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "ParseResource": {
         "type": "object",
         "properties": {
@@ -12109,13 +12239,6 @@
           },
           "sortDirection": {
             "$ref": "#/components/schemas/SortDirection"
-          },
-          "filters": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PagingResourceFilter"
-            },
-            "nullable": true
           },
           "totalRecords": {
             "type": "integer",

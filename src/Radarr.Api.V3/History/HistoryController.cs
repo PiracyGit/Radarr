@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using NzbDrone.Common.Extensions;
 using NzbDrone.Core.CustomFormats;
 using NzbDrone.Core.Datastore;
 using NzbDrone.Core.DecisionEngine.Specifications;
@@ -59,36 +60,40 @@ namespace Radarr.Api.V3.History
         }
 
         [HttpGet]
-        public PagingResource<HistoryResource> GetHistory(bool includeMovie)
+        [Produces("application/json")]
+        public PagingResource<HistoryResource> GetHistory([FromQuery] PagingRequestResource paging, bool includeMovie, int? eventType, string downloadId, [FromQuery] int[] movieIds = null, [FromQuery] int[] languages = null, [FromQuery] int[] quality = null)
         {
-            var pagingResource = Request.ReadPagingResourceFromRequest<HistoryResource>();
+            var pagingResource = new PagingResource<HistoryResource>(paging);
             var pagingSpec = pagingResource.MapToPagingSpec<HistoryResource, MovieHistory>("date", SortDirection.Descending);
 
-            var eventTypeFilter = pagingResource.Filters.FirstOrDefault(f => f.Key == "eventType");
-            var downloadIdFilter = pagingResource.Filters.FirstOrDefault(f => f.Key == "downloadId");
-
-            if (eventTypeFilter != null)
+            if (eventType.HasValue)
             {
-                var filterValue = (MovieHistoryEventType)Convert.ToInt32(eventTypeFilter.Value);
+                var filterValue = (MovieHistoryEventType)eventType.Value;
                 pagingSpec.FilterExpressions.Add(v => v.EventType == filterValue);
             }
 
-            if (downloadIdFilter != null)
+            if (downloadId.IsNotNullOrWhiteSpace())
             {
-                var downloadId = downloadIdFilter.Value;
                 pagingSpec.FilterExpressions.Add(h => h.DownloadId == downloadId);
             }
 
-            return pagingSpec.ApplyToPage(_historyService.Paged, h => MapToResource(h, includeMovie));
+            if (movieIds != null && movieIds.Any())
+            {
+                pagingSpec.FilterExpressions.Add(h => movieIds.Contains(h.MovieId));
+            }
+
+            return pagingSpec.ApplyToPage(h => _historyService.Paged(pagingSpec, languages, quality), h => MapToResource(h, includeMovie));
         }
 
         [HttpGet("since")]
+        [Produces("application/json")]
         public List<HistoryResource> GetHistorySince(DateTime date, MovieHistoryEventType? eventType = null, bool includeMovie = false)
         {
             return _historyService.Since(date, eventType).Select(h => MapToResource(h, includeMovie)).ToList();
         }
 
         [HttpGet("movie")]
+        [Produces("application/json")]
         public List<HistoryResource> GetMovieHistory(int movieId, MovieHistoryEventType? eventType = null, bool includeMovie = false)
         {
             return _historyService.GetByMovieId(movieId, eventType).Select(h => MapToResource(h, includeMovie)).ToList();
