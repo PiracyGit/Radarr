@@ -982,7 +982,6 @@
     "Download": "İndir",
     "DownloadClientCheckDownloadingToRoot": "İndirme istemcisi {downloadClientName}, indirmeleri kök klasöre yerleştirir {path}. Bir kök klasöre indirmemelisiniz.",
     "DeleteFileLabel": "{0} Film Dosyasını Sil",
-    "UnableToAddRootFolder": "Kök klasörler yüklenemiyor",
     "Blocklist": "Kara liste",
     "BlocklistRelease": "Kara Liste Yayını",
     "RemoveFromBlocklist": "Kara listeden kaldır",
@@ -1006,6 +1005,9 @@
     "DeleteRemotePathMappingMessageText": "Bu uzak yol eşlemesini silmek istediğinizden emin misiniz?",
     "AddAutoTag": "Otomatik Etiket Ekle",
     "AddCondition": "Koşul Ekle",
-    "AddConditionImplementation": "Koşul Ekle - {uygulama Adı}",
-    "AddConnection": "Bağlantı Ekle"
+    "AddConditionImplementation": "Koşul Ekle - {implementationName}",
+    "AddConnection": "Bağlantı Ekle",
+    "AddIndexerImplementation": "Koşul Ekle - {implementationName}",
+    "AddConnectionImplementation": "Koşul Ekle - {implementationName}",
+    "EditIndexerImplementation": "Koşul Ekle - {implementationName}"
 }
