@@ -4307,23 +4307,7 @@
           "200": {
             "description": "Success",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ManualImportResource"
-                  }
-                }
-              },
               "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ManualImportResource"
-                  }
-                }
-              },
-              "text/json": {
                 "schema": {
                   "type": "array",
                   "items": {
@@ -4342,22 +4326,6 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/ManualImportReprocessResource"
-                }
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/ManualImportReprocessResource"
-                }
-              }
-            },
-            "application/*+json": {
               "schema": {
                 "type": "array",
                 "items": {
@@ -5220,8 +5188,11 @@
             "name": "movieId",
             "in": "query",
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
             }
           },
           {
@@ -6593,6 +6564,14 @@
               "type": "boolean",
               "default": false
             }
+          },
+          {
+            "name": "changeCategory",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
           }
         ],
         "responses": {
@@ -6664,6 +6643,14 @@
           },
           {
             "name": "skipRedownload",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "changeCategory",
             "in": "query",
             "schema": {
               "type": "boolean",
@@ -11203,9 +11190,6 @@
             "type": "integer",
             "format": "int32"
           },
-          "hasFile": {
-            "type": "boolean"
-          },
           "youTubeTrailerId": {
             "type": "string",
             "nullable": true
@@ -11221,6 +11205,10 @@
           "qualityProfileId": {
             "type": "integer",
             "format": "int32"
+          },
+          "hasFile": {
+            "type": "boolean",
+            "nullable": true
           },
           "monitored": {
             "type": "boolean"
@@ -11302,6 +11290,9 @@
           "popularity": {
             "type": "number",
             "format": "float"
+          },
+          "statistics": {
+            "$ref": "#/components/schemas/MovieStatisticsResource"
           }
         },
         "additionalProperties": false
@@ -11312,6 +11303,27 @@
           "minutes"
         ],
         "type": "string"
+      },
+      "MovieStatisticsResource": {
+        "type": "object",
+        "properties": {
+          "movieFileCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sizeOnDisk": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "releaseGroups": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "MovieStatusType": {
         "enum": [
@@ -11922,6 +11934,11 @@
             "format": "date-time",
             "nullable": true
           },
+          "added": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
           "status": {
             "type": "string",
             "nullable": true
@@ -11953,6 +11970,9 @@
           "downloadClient": {
             "type": "string",
             "nullable": true
+          },
+          "downloadClientHasPostImportCategory": {
+            "type": "boolean"
           },
           "indexer": {
             "type": "string",
