@@ -454,7 +454,7 @@
     "MediaManagementSettingsLoadError": "无法加载媒体管理设置",
     "UnableToLoadManualImportItems": "无法加载手动导入项目",
     "ImportListsLoadError": "无法加载列表",
-    "UnableToLoadListOptions": "无法加载列表选项",
+    "ListOptionsLoadError": "无法加载列表选项",
     "IndexersLoadError": "无法加载搜刮器",
     "IndexerOptionsLoadError": "无法加载搜刮器选项",
     "GeneralSettingsLoadError": "无法加载通用设置",
@@ -528,7 +528,7 @@
     "AddToDownloadQueue": "添加到下载队列",
     "AddImportListExclusion": "添加列表例外",
     "AddingTag": "添加标签",
-    "AddImportExclusionHelpText": "防止列表中的电影被添加到 {appName} 中",
+    "AddListExclusionMovieHelpText": "防止列表中的电影被添加到 {appName} 中",
     "AddExclusion": "添加排除",
     "AddedToDownloadQueue": "已加入下载队列",
     "Added": "已添加",
@@ -1079,7 +1079,7 @@
     "DeleteCondition": "删除条件",
     "DeleteConditionMessageText": "你确定要删除条件 “{name}” 吗？",
     "DeleteDelayProfileMessageText": "你确定要删除此延迟配置吗？",
-    "DeleteCustomFormatMessageText": "您确定要删除自定义格式“{customFormatName}”吗?",
+    "DeleteCustomFormatMessageText": "您确定要删除自定义格式“{name}”吗?",
     "DeleteRemotePathMappingMessageText": "你确定要删除此远程路径映射吗？",
     "ImportScriptPath": "导入脚本路径",
     "ImportUsingScript": "使用脚本导入",
@@ -1403,5 +1403,6 @@
     "NotificationsPushcutSettingsNotificationName": "通知名称",
     "NotificationsPushcutSettingsNotificationNameHelpText": "Pushcut app 通知页中的通知名称",
     "DownloadClientPriorityHelpText": "下载客户端优先级，从1（最高）到50（最低），默认为1。具有相同优先级的客户端将轮换使用。",
-    "IndexerSettingsRejectBlocklistedTorrentHashes": "抓取时舍弃列入黑名单的种子散列值"
+    "IndexerSettingsRejectBlocklistedTorrentHashes": "抓取时舍弃列入黑名单的种子散列值",
+    "ChangeCategory": "改变分类"
 }

@@ -338,7 +338,7 @@
     "BranchUpdateMechanism": "Ramo utilizzato dal sistema di aggiornamento esterno",
     "BranchUpdate": "Ramo da usare per aggiornare {appName}",
     "AddingTag": "Aggiungendo etichetta",
-    "AddImportExclusionHelpText": "Impedire che il film venga aggiunto a {appName} dalle liste",
+    "AddListExclusionMovieHelpText": "Impedire che il film venga aggiunto a {appName} dalle liste",
     "SupportedCustomConditions": "{appName} supporta condizioni personalizzate verso le seguenti release.",
     "Proper": "Proper",
     "Posters": "Locandine",
@@ -630,7 +630,7 @@
     "MetadataLoadError": "Non riesco a caricare i metadati",
     "MediaManagementSettingsLoadError": "Non riesco a caricare le impostazioni di Gestione dei Media",
     "ImportListsLoadError": "Non riesco a caricare le liste",
-    "UnableToLoadListOptions": "Non riesco a caricare le opzione delle liste",
+    "ListOptionsLoadError": "Non riesco a caricare le opzione delle liste",
     "ImportListExclusionsLoadError": "Non riesco a caricare le liste di esclusione",
     "IndexersLoadError": "Impossibile caricare gli Indicizzatori",
     "IndexerOptionsLoadError": "Non riesco a caricare le opzioni dell'indexer",
@@ -1034,7 +1034,7 @@
     "ApplyTagsHelpTextReplace": "Sostituire: Sostituisce le etichette con quelle inserite (non inserire nessuna etichette per eliminarle tutte)",
     "DownloadClientMovieTagHelpText": "Usa questo indicizzatore per i film con almeno un tag corrispondente. Lascia in bianco per usarlo con tutti i film.",
     "DeleteConditionMessageText": "Sei sicuro di voler eliminare la condizione '{0}'?",
-    "DeleteCustomFormatMessageText": "Sei sicuro di voler eliminare il formato personalizzato '{customFormatName}'?",
+    "DeleteCustomFormatMessageText": "Sei sicuro di voler eliminare il formato personalizzato '{name}'?",
     "DeleteDelayProfileMessageText": "Sei sicuro di voler cancellare questo profilo di ritardo?",
     "DeleteFormatMessageText": "Sei sicuro di voler cancellare il formato etichetta {0} ?",
     "DeleteImportListExclusionMessageText": "Sei sicuro di voler cancellare questa lista di esclusioni delle importazioni?",
@@ -1087,5 +1087,7 @@
     "AuthenticationRequiredWarning": "Per prevenire accessi remoti non autorizzati, {appName} da ora richiede che l'autenticazione sia abilitata. Opzionalmente puoi disabilitare l'autenticazione per gli indirizzi di rete locali.",
     "CustomFormatJson": "Formato Personalizzato JSON",
     "AddImportListImplementation": "Aggiungi lista di importazione - {implementationName}",
-    "AutoRedownloadFailed": "Download fallito"
+    "AutoRedownloadFailed": "Download fallito",
+    "AddAutoTagError": "Impossibile aggiungere un nuovo tag automatico, riprova.",
+    "AddDelayProfileError": "Impossibile aggiungere un nuovo profilo di ritardo, riprova."
 }
