@@ -526,6 +526,27 @@
             "schema": {
               "$ref": "#/components/schemas/SortDirection"
             }
+          },
+          {
+            "name": "movieIds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "protocols",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/DownloadProtocol"
+              }
+            }
           }
         ],
         "responses": {
@@ -4741,6 +4762,14 @@
               "type": "boolean",
               "default": false
             }
+          },
+          {
+            "name": "languageId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
           }
         ],
         "responses": {
@@ -8568,6 +8597,9 @@
           "folder": {
             "type": "string",
             "nullable": true
+          },
+          "isExcluded": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -12034,10 +12066,6 @@
             "$ref": "#/components/schemas/DownloadProtocol"
           },
           "indexerFlags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
             "nullable": true
           },
           "movieId": {
