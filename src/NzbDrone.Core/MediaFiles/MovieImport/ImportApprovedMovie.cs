@@ -227,7 +227,7 @@ namespace NzbDrone.Core.MediaFiles.MovieImport
                 return grandparentPath.GetRelativePath(path);
             }
 
-            return Path.Combine(Path.GetFileName(parentPath), Path.GetFileName(path));
+            return Path.GetFileName(path);
         }
     }
 }
