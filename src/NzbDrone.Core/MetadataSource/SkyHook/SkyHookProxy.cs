@@ -288,7 +288,7 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
                 };
             }
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             movie.Status = MovieStatusType.Announced;
 
@@ -667,6 +667,16 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
                     Type = (RatingType)Enum.Parse(typeof(RatingType), ratings.RottenTomatoes.Type),
                     Value = ratings.RottenTomatoes.Value,
                     Votes = ratings.RottenTomatoes.Count
+                };
+            }
+
+            if (ratings.Trakt != null)
+            {
+                mappedRatings.Trakt = new RatingChild
+                {
+                    Type = (RatingType)Enum.Parse(typeof(RatingType), ratings.Trakt.Type),
+                    Value = ratings.Trakt.Value,
+                    Votes = ratings.Trakt.Count
                 };
             }
 
