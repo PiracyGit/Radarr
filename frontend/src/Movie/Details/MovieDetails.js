@@ -423,36 +423,41 @@ class MovieDetails extends Component {
                   <div>
                     {
                       certification ?
-                        <span className={styles.certification}>
+                        <span className={styles.certification} title={translate('Certification')}>
                           {certification}
                         </span> :
                         null
                     }
 
-                    {
-                      year > 0 ?
-                        <span className={styles.year}>
-                          <Popover
-                            anchor={
-                              year
-                            }
-                            title={translate('ReleaseDates')}
-                            body={
-                              <MovieReleaseDates
-                                inCinemas={inCinemas}
-                                digitalRelease={digitalRelease}
-                                physicalRelease={physicalRelease}
-                              />
-                            }
-                            position={tooltipPositions.BOTTOM}
+                    <span className={styles.year}>
+                      <Popover
+                        anchor={
+                          year > 0 ? (
+                            year
+                          ) : (
+                            <Icon
+                              name={icons.WARNING}
+                              kind={kinds.WARNING}
+                              size={20}
+                            />
+                          )
+                        }
+                        title={translate('ReleaseDates')}
+                        body={
+                          <MovieReleaseDates
+                            tmdbId={tmdbId}
+                            inCinemas={inCinemas}
+                            digitalRelease={digitalRelease}
+                            physicalRelease={physicalRelease}
                           />
-                        </span> :
-                        null
-                    }
+                        }
+                        position={tooltipPositions.BOTTOM}
+                      />
+                    </span>
 
                     {
                       runtime ?
-                        <span className={styles.runtime}>
+                        <span className={styles.runtime} title={translate('Runtime')}>
                           {formatRuntime(runtime, movieRuntimeFormat)}
                         </span> :
                         null

@@ -254,7 +254,6 @@
     "MovieFiles": "Pliki filmowe",
     "OnGrab": "Na Grab",
     "OnHealthIssue": "W kwestii zdrowia",
-    "OnImport": "Przy imporcie",
     "OpenThisModal": "Otwórz ten modal",
     "PreferTorrent": "Wolisz Torrent",
     "PreferUsenet": "Preferuj Usenet",
@@ -901,7 +900,7 @@
     "UnableToLoadRootFolders": "Nie można załadować folderów głównych",
     "TagsLoadError": "Nie można załadować tagów",
     "CalendarLoadError": "Nie można załadować kalendarza",
-    "UpdateRadarrDirectlyLoadError": "Nie można bezpośrednio zaktualizować {appName},",
+    "UpdateAppDirectlyLoadError": "Nie można bezpośrednio zaktualizować {appName},",
     "Ungroup": "Rozgrupuj",
     "Unlimited": "Nieograniczony",
     "Unmonitored": "Niemonitorowane",
@@ -952,7 +951,6 @@
     "OnMovieDelete": "Usuń film",
     "OnMovieFileDelete": "Usuń plik filmowy",
     "OnMovieFileDeleteForUpgrade": "W przypadku usunięcia pliku filmowego w celu uaktualnienia",
-    "OnUpgrade": "Przy aktualizacji",
     "Reddit": "Reddit",
     "More": "Jeszcze",
     "Download": "Ściągnij",
@@ -1186,5 +1184,6 @@
     "ShowDigitalReleaseHelpText": "Pokaż datę premiery pod plakatem",
     "ShowPhysicalRelease": "Fizyczna data wydania",
     "ShowPhysicalReleaseHelpText": "Pokaż datę premiery pod plakatem",
-    "YesterdayAt": "Wczoraj o {time}"
+    "YesterdayAt": "Wczoraj o {time}",
+    "FolderNameTokens": "Tokeny nazw plików"
 }
